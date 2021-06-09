@@ -2,7 +2,7 @@
 
 /*
 	* Catalog
-	* @Version 1.0.0
+	* @Version 1.0.1
 	* Developed by: Ami (亜美) Denault
 	* Web Objects Library Functions
 */
