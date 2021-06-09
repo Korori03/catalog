@@ -2,7 +2,7 @@
 
 /*
 	* Catalog
-	* @Version 1.0.1
+	* @Version 1.0.2
 	* Developed by: Ami (亜美) Denault
 	* Page Library Functions
 */
