@@ -30,7 +30,7 @@ ob_start("ob_gzhandler");
 	* Global Config
 */
 
-require 'config.php'
+require 'config.php';
 
 /*
 	* Autoload Classes
