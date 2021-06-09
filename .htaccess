@@ -1,0 +1,92 @@
+# -----------------------------------------------------------
+# |				CUSTOM HTACCES CREATED BY KORORI     		          |
+# -----------------------------------------------------------
+
+
+# SECURE ACCESS TO HTACCESS FILE
+<Files .htaccess>
+ order allow,deny
+ deny from all
+</Files>
+
+
+<Files calendar.php>
+ order allow,deny
+ deny from all
+</Files>
+
+<IfModule mod_expires.c> 
+   ExpiresActive on 
+   ExpiresByType text/html "access 2 day" 
+   ExpiresByType text/css "access 2 day" 
+   ExpiresByType application/javascript "access 1 month" 
+   ExpiresByType text/plain "access 1 month" 
+   ExpiresByType image/jpeg "access 1 month" 
+   ExpiresByType image/gif "access 1 month" 
+   ExpiresByType image/png "access 1 month" 
+   ExpiresByType application/pdf "access 1 month" 
+   ExpiresByType application/x-shockwave-flash "access 1 month" 
+   ExpiresDefault "access 2 days" 
+  </IfModule> 
+  
+
+
+
+RewriteEngine On
+#RewriteCond %{HTTPS} !=on
+#RewriteRule ^/?(.*) https://%{SERVER_NAME}/$1 [R,L]
+RewriteBase /
+RewriteCond %{REQUEST_FILENAME} !-f
+RewriteCond %{REQUEST_FILENAME} !-d
+DirectoryIndex index.php
+
+
+#######################################################
+#       	Rewrite Rule for Pages				  #
+#######################################################
+
+
+
+
+
+RewriteRule ^jquery$ /jquery.php [L]
+RewriteRule ^(login|logout|items|cpanel|profile)$ /index.php?action=$1 [L]
+
+
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/edit/([0-9]+)-([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$1&subtype=$2&command=edit&edit=$3	[L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/add$ /index.php?action=items&type=$1&subtype=$2&command=add	[L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/edit/([0-9]+)-([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$1&subtype=$2&subnestedtype=$3&command=edit&edit=$4	[L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/add$ /index.php?action=items&type=$1&subtype=$2&subnestedtype=$3&command=add	[L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)$ /index.php?action=items&type=$1 [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$1&subtype=$2 [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/(search|letter)/([a-zA-Z0-9_]+)$ /index.php?action=items&type=$1&subtype=$2&object=$3&objectitem=$4  [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/(search|letter)/([a-zA-Z0-9_]+)/([0-9]+)-page$ /index.php?action=items&type=$1&subtype=$2&object=$4&objectitem=$5&page=$6  [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([0-9]+)-page$ /index.php?action=items&type=$1&subtype=$2&page=$3 [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)$ /index.php?action=items&type=$1&subtype=$2&subnestedtype=$3  [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/(search|letter)/([a-zA-Z0-9_]+)$ /index.php?action=items&type=$1&subtype=$2&subnestedtype=$3&object=$4&objectitem=$5  [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/(search|letter)/([a-zA-Z0-9_]+)/([0-9]+)-page$ /index.php?action=items&type=$1&subtype=$2&subnestedtype=$3&object=$4&objectitem=$5&page=$6  [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([0-9]+)-([a-zA-Z0-9-_\-]+)$ /index.php?action=items&type=$1&subtype=$2&item=$3 [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/([0-9]+)-page$ /index.php?action=items&type=$1&subtype=$2&subnestedtype=$3&page=$4 [L]
+RewriteRule ^(books|figures|games|music|videos|tcg|members)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/([0-9]+)-([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$1&subtype=$2&subnestedtype=$3&item=$4 [L]
+
+
+RewriteRule ^([a-zA-Z0-9-_]+)$ /index.php?user=$1 [L]
+
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/edit/([0-9]+)-([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$2&subtype=$3&command=edit&edit=$4&user=$1	[L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/add$ /index.php?action=items&type=$2&subtype=$3&command=add&user=$1	[L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/edit/([0-9]+)-([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$2&subtype=$3&subnestedtype=$4&command=edit&edit=$5&user=$1	[L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/add$ /index.php?action=items&type=$2&subtype=$3&subnestedtype=$4&command=add&user=$1	[L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)$ /index.php?action=items&type=$2&user=$1 [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$2&subtype=$3&user=$1 [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/(search|letter)/([a-zA-Z0-9_]+)$ /index.php?action=items&type=$2&subtype=$3&object=$4&objectitem=$5&user=$1  [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/(search|letter)/([a-zA-Z0-9_]+)/([0-9]+)-page$ /index.php?action=items&type=$2&subtype=$3&object=$4&objectitem=$5&page=$6&user=$1  [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([0-9]+)-page$ /index.php?action=items&type=$2&subtype=$3&page=$4&user=$1 [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)$ /index.php?action=items&type=$2&subtype=$3&subnestedtype=$4&user=$1  [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/(search|letter)/([a-zA-Z0-9_]+)$ /index.php?action=items&type=$2&subtype=$3&subnestedtype=$4&object=$5&objectitem=$6&user=$1  [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/(search|letter)/([a-zA-Z0-9_]+)/([0-9]+)-page$ /index.php?action=items&type=$2&subtype=$3&subnestedtype=$4&object=$5&objectitem=$6&page=$7&user=$1  [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([0-9]+)-([a-zA-Z0-9-_\-]+)$ /index.php?action=items&type=$2&subtype=$3&item=$4&user=$1 [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/([0-9]+)-page$ /index.php?action=items&type=$2&subtype=$3&subnestedtype=$4&page=$5&user=$1 [L]
+RewriteRule ^([a-zA-Z0-9-_]+)/(books|figures|games|music|videos|tcg)/([a-zA-Z0-9-_]+)/([a-zA-Z0-9_]+)/([0-9]+)-([a-zA-Z0-9-_]+)$ /index.php?action=items&type=$2&subtype=$3&subnestedtype=$4&item=$5&user=$1 [L]
+
+
+

@@ -1,0 +1,14 @@
+{
+  "name": "AmiCatalog",
+  "short_name": "AmiCatalog",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#317EFB",
+  "background_color": "#317EFB",
+  "description": "Catalog System for Ami",
+  "icons": [{
+    "src": "images/touch/homescreen48.png",
+    "sizes": "48x48",
+    "type": "image/png"
+  }]
+}

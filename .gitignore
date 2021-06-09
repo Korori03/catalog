@@ -1,0 +1,6 @@
+core/init.php
+*.pdf
+content/uploads/*
+content/themes/compact-blue/*
+content/themes/simple-manager/*
+!content/uploads/.gitignore

@@ -1,0 +1,1 @@
+<span class="addicon fa fright single-url-link" data-url="[@url]"><a></a></span>
