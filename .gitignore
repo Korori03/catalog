@@ -1,4 +1,4 @@
-core/init.php
+core/config.php
 *.pdf
 content/uploads/*
 content/themes/compact-blue/*
