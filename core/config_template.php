@@ -19,7 +19,7 @@ $GLOBALS['config']=array(
 		'session_name'=>'user'
 	),
 	'hash'=>array(
-		'blowfish'=>'Pwn1337',
+		'blowfish'=>'XXXXXXX',
 		'makeHash'=>array(
 			'initial'=>array('start'=>{Number},'length'=>{Number}),
 			'mid_one'=>array('start'=>{Number},'length'=>{Number}),
