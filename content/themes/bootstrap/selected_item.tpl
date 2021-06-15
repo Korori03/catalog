@@ -23,7 +23,7 @@ $(function(){
 <div class="module-item">
 	<h2 class="header small">[@name]</h2>
 	<div class="wrap">
-	  <div class="row-item">         
+	  <div class="row-item" style=" text-align: center;">
 			<img alt="[@slug]" title="[@slug]" src="[@img]">           
 	  </div>
 	  <div class="row-item">

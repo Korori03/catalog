@@ -868,7 +868,7 @@ class Pages{
 							)
 							)
 						);			
-			
+
 		return self::generateNestedList($main_type,$breadcrumbs,$page_title,$url_link,$sql);
 	}
 	
