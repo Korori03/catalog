@@ -1,7 +1,6 @@
 <?php
 
 /*
-	* Korori-Gaming
 	* Json Class Set
 	* @Version 1.0.0
 	* Developed by: Ami (亜美) Denault
@@ -11,19 +10,18 @@
 	* JSON Template Class
 	* @since 1.0.0
 */	
-
+declare(strict_types=1);
 class Json {
 
 /*
 	* Encode Jason
 	* @since 1.0.0
-	* @Param (String Json, Int Options)
+	* @Param (Object/Array Json, Int Options)
 */	
-    public static function encode($value, $options = 0) {
+    public static function encode(mixed $value,int $options = 0):string {
         $result = json_encode($value, $options);
         if($result)  
             return $result;
-
     }
 
 /*
@@ -31,7 +29,7 @@ class Json {
 	* @since 1.0.0
 	* @Param (String Json, Bool Associate)
 */	
-    public static function decode($json, $assoc = false) {
+    public static function decode(string $json,bool $assoc = false):object|array {
         $result = json_decode($json, $assoc);
 	
         if($result) 
@@ -43,14 +41,13 @@ class Json {
 	* Url Json to XML
 	* @since 1.0.0
 	* @Param (String Url)
-*/		
-	public function toXml ($url) {
+*/
+	public function toXml (string $url):string {
 		$fileContents= file_get_contents($url);
 		$fileContents = str_replace(array("\n", "\r", "\t"), '', $fileContents);
 		$fileContents = trim(str_replace('"', "'", $fileContents));
 		$simpleXml = simplexml_load_string($fileContents);
 		return self::encode($simpleXml);
-
 	}
 
 /*
@@ -58,28 +55,17 @@ class Json {
 	* @Since 4.0.0
 	* @Param (String JSon)
 */	
-	public static function toSTD($json){
+	public static function toSTD(string $json):object {
 		$array = self::decode($json,true);
-		return arrays::toSTD($array);
+		return arr::_toObject($array);
 	}
-	
-/*
-	* STD to Json
-	* @Since 4.0.1
-	* @Param (String JSon)
-*/	
-	public static function fromSTD($std){
-		$array = self::encode((array)$std);
-		return $array;
-	}
-	
 
 /*
 	* Json into MySQL
 	* @Since 4.0.0
 	* @Param (String Table,String JSon)
-*/		
-	public static function toMySql($table,$json){
+*/
+	public static function toMySql(string $table,string $json){
 		
 		$stdAry = self::decode($json,true);
 		$db = Database::getInstance();
@@ -112,37 +98,19 @@ class Json {
 		return true;	
 	}
 
-
-	public static function getInstance($call, $params) {
-		if(!empty($params)){
-			if(in_array(strtolower($call), array_keys(array_change_key_case(api::$_callList,CASE_LOWER)))){
-				if(array_change_key_case(api::$_callList,CASE_LOWER)[strtolower($call)] == count($params)){
-					$sql = "Call " . $call ."('" . implode("','", $params) . "');";
-					$query = (array)Database::getInstance()->query($sql)->results();
-					api::jsonFormat(true,api::utf8ize($query));
-					
-				}
-				else
-				api::jsonFormat(false,'Invalid Params');
-			}
-			else
-				api::jsonFormat(false,'Invalid Call');
-		}
-		else
-			api::jsonFormat(false,'Invalid Params');
-	}
-			
-
-	public static function returnJson($status,$data){
-		$response = array();
-		
+/*
+	* Return Json
+	* @Since 4.0.0
+	* @Param (String Table,String JSon)
+*/
+	public static function returnJson(bool $status,$data):string{
 		$response = array(
-			'status' 	=> (bool)$status,
+			'status' 	=> cast::_string($status),
 			'message' 	=> $data
 		);
 
 		header("Content-type: application/json");
-		return json_encode($response);
+		return json::encode($response);
 	}
 }
 ?>

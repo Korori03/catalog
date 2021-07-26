@@ -44,7 +44,7 @@
 	}
 
 /* Call Page Action */
-	$action = strings::_strtolower(Input::get('action'));
+	$action = str::_strtolower(Input::get('action'));
 
 /* Concatenate Action */	
 	$template['content'] .= Pages::action($action);

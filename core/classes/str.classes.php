@@ -1,6 +1,5 @@
 <?php
 /*
-	* Korori-Gaming
 	* Strings Class Set
 	* @Version 4.0.0
 	* Developed by: Ami (亜美) Denault
@@ -8,78 +7,30 @@
 /*
 	* Strings
 	* @Since 4.0.0
-*/	
-class Strings{
-
-/*
-	* Timestamp Conversion Date
-	* @Since 1.1.4
-	* @Param (String)
-*/	
-	public static function toProperDate($string,$strConv = true){
-		if($strConv)
-			return date('jS \of F Y',strtotime($string));
-		else
-			return date('jS \of F Y',$string);
-	}
-	
-	public static function toDateTime($string,$strConv = true){
-		if($strConv)
-			return date('m-d-Y H:i:s',strtotime($string));
-		else
-			return date('m-d-Y H:i:s',$string);
-	}
-	
-	public static function toDateTimeMysql($string,$strConv = true){
-		if($strConv)
-			return date('Y-m-d H:i:s',strtotime($string));
-		else
-			return date('Y-m-d H:i:s',$string);
-	}
-	
-	public static function toDate($string,$strConv = true){
-		if($strConv)
-			return date('m-d-Y',strtotime($string));
-			
-		else
-			return date('m-d-Y',$string);
-	}
-	public static function toDateYMD($string,$strConv = true){
-		if($strConv)
-			return date('Y-m-d',strtotime($string));
-		else
-			return date('Y-m-d',$string);
-	}
-	/*
-	* Convert Numerical to Month
-	* @Since 2.2.8
-	* @Param (String)
 */
-	public static function toMonthName($intMonth) { 
-		$month = array(0=>'',1=>'January',2=>'February',3=>'March',4=>'April',5=>'May',6=>'June',7=>'July',8=>'August',9=>'September',10=>'October', 11=>'November',12=>'December'); 
-		return $month[$intMonth];
-	}
+declare(strict_types=1);
+class str{
 
 /*
 	* Phone Href Replacement
 	* @Since 4.0.0
-	* @Param (Array, String, String)
+	* @Param (String phone)
 */		
-	public static function toPhoneHref($buffer) {
-		return str_replace(array(".","-"),'',$buffer);
+	public static function _toPhoneHref(string $phone):string {
+		return str_replace(array(".","-"),'',$phone);
 	}
-	
+
 /*
 	* String Options
 	* @Since 4.0.0
-	* @Param (String)
+	* @Param (String RawJSON)
 */	
-	public static function string_options($options = 'javascript'){
-		$obj = Json::decode(Options::get($options));
+	public static function string_options(string $options = 'javascript'):string{
+		$obj = json::decode(Options::get($options));
 		$return_options ='';
 		
 		foreach ($obj as $name => $value) {
-			
+
 			if($options =='javascript')
 				$return_options.='<!--' . $name . '--><script src="'.$value.'" type="text/javascript"></script>';
 			else if($options =='css')
@@ -87,101 +38,55 @@ class Strings{
 		}
 		return $return_options;
 	}
-	
-/*
-	* Extension Allowed
-	* @Since 2.2.8
-	* @Param (File String, Extension String)
-*/
-	public static function allowedExt($string, $ext = 'jpg,jpeg,gif,png'){
-		
-		$extension =  self::_extension($string);	
-
-		$all_types = explode(",",$ext);
-		if($ext) {
-			if(in_array($extension,$all_types))		
-				return true;	
-		}
-		return false;
-	
-	}
-
-/*
-	* Current Time
-	* @Version 1.0.0
-	* @Since 4.0.6
-	* @Param (String)
-*/	
-	public static function _currenttime( $type, $gmt = 0 ) {
-		switch ( $type ) {
-			case 'mysql':
-				return ( $gmt ) ? gmdate( 'Y-m-d H:i:s' ) : gmdate( 'Y-m-d H:i:s', ( time() + ( Options::get( 'gmt_offset' ) * Config::get('time/HOUR_IN_SECONDS') ) ) );
-			case 'timestamp':
-				return ( $gmt ) ? time() : time() + ( Options::get( 'gmt_offset' ) * Config::get('time/HOUR_IN_SECONDS') );
-			default:
-				return ( $gmt ) ? date( $type ) : date( $type, time() + ( Options::get( 'gmt_offset' ) * Config::get('time/HOUR_IN_SECONDS') ) );
-		}
-	}
 
 
 /*
 	* Formate String
 	* @Since 2.1.4
-	* @Param (String)
-*/	
-	public static function _format($string){
+	* @Param (String string)
+*/
+	public static function _format(string $string):string{
 		return ucwords(self::_strtolower(trim($string)));
 	}
-	
+
 /*
 	* Format Money
 	* @Since 2.1.4
-	* @Param (String Number,Boolean Fraction)
+	* @Param (String Number,Boolean Fraction,Boolean Symbol)
 */
-	public static function _money($number, $fractional=false,$symbol=true) { 	
-		if ($fractional) { 
-			$number = sprintf('%.2f', $number); 
+	public static function _money(mixed $number,bool $fractional=false,bool $symbol=true):string {
+		if ($fractional) {
+			$number = sprintf('%.2f', $number);
 		} 
 		while (true) { 
-			$replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number); 
+			$replaced = preg_replace('/(-?\d+)(\d\d\d)/', '$1,$2', $number);
 			if ($replaced != $number) { 
 				$number = $replaced; 
-			} else { 
+			} else {
 				break; 
-			} 
-		} 
-		return ($symbol?'$':''). $number; 
+			}
+		}
+		return ($symbol?'$':''). $number;
 	} 
-
-
-/*
-	* Get Extension of File
-	* @Since 2.2.8
-	* @Param (String)
-*/	
-	public static function _extension($str) {
-		return @end(explode('.',$str));
-	}
-
 
 /*
 	* Strip Slashes
 	* @Since 4.0.2
-	* @Param (String)
-*/		
-	public static function _stripslashes ($str) {
-		if (is_array($str)) {
+	* @Param (String string)
+*/
+	public static function _stripslashes (mixed $str):string {
+		if (is_array($str))
 			return array_map('stripslashes', $str);
-		}
+
 		return stripslashes($str);
 	}
 
 /*
 	* Add Slashes
 	* @Since 4.0.2
-	* @Param (String)
+	* @Param (String string)
 */
-	public static function _addslashes ($str) {
+	public static function _addslashes (mixed $str):string {
 		if (is_array($str)) 
 			return array_map('addslashes', $str);
 		
@@ -191,13 +96,13 @@ class Strings{
 /*
 	* Trim String
 	* @Since 4.0.2
-	* @Param (String,Char List)
+	* @Param (String string,Char List)
 */
-	public static function _trim ($str, $charlist = " \t\n\r\0\x0B") {
+	public static function _trim (mixed $str,string $charlist = " \t\n\r\0\x0B"):string {
 		if (is_array($str)) {
-			foreach ($str as &$s) 
+			foreach ($str as &$s)
 				$s = trim($s, $charlist);
-			
+
 			return $str;
 		}
 		return trim($str, $charlist);
@@ -206,9 +111,9 @@ class Strings{
 /*
 	* Left Trim String
 	* @Since 4.0.2
-	* @Param (String,Char List)
+	* @Param (String string,Char List)
 */
-	public static function _ltrim ($str, $charlist = " \t\n\r\0\x0B") {
+	public static function _ltrim (mixed $str,string $charlist = " \t\n\r\0\x0B"):string {
 		if (is_array($str)) {
 			foreach ($str as &$s) 
 				$s = ltrim($s);
@@ -221,9 +126,9 @@ class Strings{
 /*
 	* Right Trim String
 	* @Since 4.0.2
-	* @Param (String,Char List)
+	* @Param (String string,Char List)
 */
-	public static function _rtrim ($str, $charlist = " \t\n\r\0\x0B") {
+	public static function _rtrim (mixed$str,string $charlist = " \t\n\r\0\x0B"):string {
 		if (is_array($str)) {
 			foreach ($str as &$s) 
 				$s = rtrim($s, $charlist);
@@ -236,11 +141,11 @@ class Strings{
 /*
 	* Substring String
 	* @Since 4.0.2
-	* @Param (String,Int Start,int Length)
+	* @Param (String string,Int Start,int Length)
 */
-	public static function _substr ($string, $start, $length = null) {
+	public static function _substr (mixed $string,int $start,mixed $length = null):string {
 		if (is_array($string)) {
-			foreach ($string as &$s) 
+			foreach ($string as &$s)
 				$s = self::_substr($s, $start, $length);
 			
 			return $string;
@@ -254,24 +159,22 @@ class Strings{
 /*
 	* To Lower
 	* @Since 4.0.2
-	* @Param (String)
+	* @Param (String string)
 */	
-	public static function _strtolower ($string) {
-		
-		if (is_array($string)) {
-			
+	public static function _strtolower (string $string):string {
+		$string = cast::_string($string);
+		if (is_array($string))
 			return array_map('strtolower', $string);
-			
-		}
+
 		return strtolower($string);
 	}
 
 /*
 	* To Upper
 	* @Since 4.0.2
-	* @Param (String)
-*/		
-	public static function _strtoupper ($string) {
+	* @Param (String string)
+*/
+	public static function _strtoupper (string $string):string {
 		if (is_array($string)) 
 			return array_map('strtoupper', $string);
 		
@@ -282,12 +185,12 @@ class Strings{
 	* Preg Match
 	* @Since 4.0.2
 	* @Param (String Pattern,String Input,Reference Matches, PREG_ OPTION, Int Offset )
-*/		
-	public static function _preg_match ($pattern, $subject, &$matches = null, $flags = 0, $offset = 0) {
-		if (strpos($pattern, '/') === false && strpos($pattern, '#') === false) 
+*/
+	public static function _preg_match (string $pattern,string $subject,mixed &$matches = null,int $flags = 0,int $offset = 0):bool {
+		if (strpos($pattern, '/') === false && strpos($pattern, '#') === false)
 			return false;
-		
-		$pattern = trim($pattern);
+
+		$pattern = self::_trim($pattern);
 		return preg_match($pattern, $subject, $matches, $flags, $offset);
 	}
 	
@@ -295,21 +198,21 @@ class Strings{
 	* Preg Replace
 	* @Since 4.0.2
 	* @Param (String Pattern,String Input, String/Array for Search,Int Limit, Int Number of Replacements Done)
-*/		
-	public static function _preg_replace ($pattern, $replacement, $subject, $limit = -1, &$count = null) {
-		if (strpos($pattern, '/') === false && strpos($pattern, '#') === false) 
+*/
+	public static function _preg_replace (string $pattern,string $replacement,string $subject,int $limit = -1,mixed &$count = null):string {
+		if (strpos($pattern, '/') === false && strpos($pattern, '#') === false)
 			return false;
 
 		$pattern = trim($pattern);
 		return preg_replace($pattern, $replacement, $subject, $limit, $count);
 	}
-	
+
 /*
 	* Truncate String
 	* @Since 4.0.2
 	* @Param (String text, Length of Returned Text, String to Concat with, Bool Exact Match, Bool Check for HTML)
 */		
-	public static function _truncate ($text, $length = 1024, $ending = '...', $exact = false, $considerHtml = true) {
+	public static function _truncate (string $text,int $length = 1024,string  $ending = '...',bool $exact = false,bool $considerHtml = true):string {
 		$open_tags = [];
 		if ($considerHtml) {
 			if (strlen(preg_replace('/<.*?>/', '', $text)) <= $length) {
@@ -356,10 +259,10 @@ class Strings{
 				}
 			}
 		} else {
-			if (mb_strlen($text) <= $length) {
+			if (mb_strlen($text) <= $length)
 				return $text;
-			}
-			$truncate = mb_substr($text, 0, $length - mb_strlen($ending));
+
+				$truncate = mb_substr($text, 0, $length - mb_strlen($ending));
 		}
 		if (!$exact) {
 			$spacepos = mb_strrpos($truncate, ' ');
@@ -369,50 +272,31 @@ class Strings{
 		}
 		$truncate .= $ending;
 		if ($considerHtml) {
-			foreach ($open_tags as $tag) {
+			foreach ($open_tags as $tag)
 				$truncate .= "</$tag>";
-			}
 		}
 		return $truncate;
 	}
-	
-/*
-	* Get Keywords from String
-	* @Since 4.0.2
-	* @Param (String)
-*/
-	public static function getkeywords ($text) {
-		return implode(', ',self::_trim(explode(' ',str_replace([',', '.', '!', '?', '-', '–', '&'], '', $text))));
-	}
-/*
-	* Convert to Website Link Title
-	* @Since 2.1.4
-	* @Param (String)
-*/
-	public static function parser_ascii_to_html_title($string) { 
-		$string = self::ascii_convert($string);
-		$string = str_replace(array(' @ '), ' ',$string);
-		$string = str_replace(array('!','?',':#40:',':#41:','&#40;','&#41;'), '',$string);
-		$string = preg_replace('#[^\w/.%\-&/]#',"_",$string);
-		$string = str_replace(array('(',')','&','/','*', '\\','_42_'), '',$string);
-		$string = preg_replace('#[?.]#',"",$string);
-		return self::_strtolower($string);																//Return String
-	}
-	
+
 /*
 	* Convert from Ascii
 	* @Since 2.1.4
-	* @Param (String)
-*/	
-	public static function ascii_convert($string){
+	* @Param (String string)
+*/
+	public static function _toAscii(string $string): string{
 		$ascii = array('@:#([0-9]{2,3}):@' => '&#$1;','@:amp:@' => '&amp;','@:quot:@'=>'\'');
 		foreach ($ascii as $search => $replace)  								
-			$string = preg_replace($search, $replace, $string);	
+			$string = preg_replace($search, $replace, $string);
 			
 		return $string;
-	}	
-	
-	public static function FileSizeConvert($bytes)
+	}
+
+/*
+	* File Size Convert
+	* @Since 2.1.4
+	* @Param (String Bytes)
+*/
+	public static function _FileSize(string $bytes): string
 	{
 		$bytes = floatval($bytes);
 			$arBytes = array(
@@ -449,6 +333,81 @@ class Strings{
 		}
 		return $result;
 	}
-}
 
-?>
+/*
+	* Between
+	* @Since 2.1.4
+	* @Param (String left,String right, String string)
+*/
+	public static function _between(string $left,string  $right,string  $string): array
+    {
+        preg_match_all('/' . preg_quote($left, '/') . '(.*?)' . preg_quote($right, '/') . '/s', $string, $matches);
+        return array_map('trim', $matches[1]);
+    }
+
+/*
+	* Insert
+	* @Since 2.1.4
+	* @Param (Array KeyValues, String string)
+*/
+	public static function _insert(mixed $keyValue,string $string)
+    {
+        if (arr::_isAssoc($keyValue)) {
+            foreach ($keyValue as $search => $replace) {
+                $string = str_replace($search, $replace, $string);
+            }
+        }
+
+        return $string;
+    }
+
+/*
+	* Limit Words
+	* @Since 2.1.4
+	* @Param (String string, Int Limit,String Ending)
+*/
+	public static function _limitWords(string $string,int  $limit = 10,string $end = '...'): string
+    {
+        $arrayWords = explode(' ', $string);
+
+        if (sizeof($arrayWords) <= $limit)
+            return $string;
+
+        return implode(' ', array_slice($arrayWords, 0, $limit)) . $end;
+    }
+
+/*
+	* Check if String Contains
+	* @Since 2.1.4
+	* @Param (Array Needle, String haystack)
+*/
+	public static function _contains(mixed $needle,string $haystack): bool
+    {
+        foreach (cast::_array($needle) as $ndl) {
+            if (strpos($haystack, $ndl) !== false)
+                return true;
+        }
+
+        return false;
+    }
+
+/*
+	* Strip Spaces
+	* @Since 2.1.4
+	* @Param (String string)
+*/
+	public static function _stripSpace(string $string): string
+    {
+        return preg_replace('/\s+/', '', $string);
+    }
+
+/*
+	* Pad Zero
+	* @Since 2.1.4
+	* @Param (String number,Int Length)
+*/
+	public static function _zeroPad(string $number, int $length): string
+    {
+        return str_pad($number, $length, '0', STR_PAD_LEFT);
+    }
+}

@@ -6,6 +6,7 @@
 	* @Version 4.0.2
 	* Developed by: Ami (亜美) Denault
 */
+declare(strict_types=1);
 class Pagination {		
 		
 	public	$itemsPerPage,
@@ -43,17 +44,18 @@ class Pagination {
 		$this->_itemHtml = $this->_getHTMLData();	
 		return $this->_itemHtml;
 	}
-				
+
 	
 	private function  _getHTMLData()
 	{
-		$html = '<nav class="my-3" aria-label="Page navigation"><ul class="pagination">';
-					
-
+		$layout = new Template("_pagination.tpl");
+		$list_item = new Template("_pagination_item.tpl");
+		$list ='';
 		if($this->currentPage>1){
-			$html .= '<li class="page-item"><a class="page-link" href="'.$this->_link .'/'.($this->currentPage-1).'-' .$this->get_type.'">'.$this->_navigation['pre'].'</a></li>';
-		}        	
-		if($this->total > $this->range){				
+			$list_item->setArray(array('active'=>'','link'=>$this->_link .'/'.($this->currentPage-1).'-' .$this->get_type,'name'=>$this->_navigation['pre']));
+			$list .= $list_item->show();
+		}
+		if($this->total > $this->range){
 			$start = ($this->currentPage <= $this->range)?1:($this->currentPage - $this->range);
 			$end   = (ceil($this->total/$this->itemsPerPage) - $this->currentPage >= $this->range)?($this->currentPage+$this->range): (ceil($this->total/$this->itemsPerPage));
 		}else{
@@ -63,15 +65,17 @@ class Pagination {
 	
 
 		for($i = $start; $i <= $end; $i++){
-			$html .= '<li class="page-item ' .($i==$this->currentPage?"active":'').'"><a class="page-link" href="'.$this->_link .'/'.$i. '-' .$this->get_type.'">'.$i.'</a></li>';
-		}        	
+			$list_item->setArray(array('active'=>($i==$this->currentPage?"active":''),'link'=>$this->_link .'/'.$i. '-' .$this->get_type,'name'=>$i));
+			$list .= $list_item->show();
+		}
 
 		if($this->currentPage<$end){
-			$html .= '<li class="page-item"><a class="page-link" href="'.$this->_link .'/'.($this->currentPage+1).'-' .$this->get_type.'">'.$this->_navigation['next'].'</a></li>';
+			$list_item->setArray(array('active'=>'','link'=>$this->_link .'/'.($this->currentPage+1).'-' .$this->get_type,'name'=>$this->_navigation['next']));
+			$list .= $list_item->show();
 		}
-		$html .= ' </ul>
-                     </nav>';
-		return $html;
+
+		$layout->setArray(array('list'=>$list));
+		return $layout->show();
 	}
 }
 ?>

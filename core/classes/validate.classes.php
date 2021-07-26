@@ -1,7 +1,6 @@
 <?php
 
 /*
-	* Korori-Gaming
 	* Validate Class Set
 	* @Version 4.0.3
 	* Developed by: Ami (亜美) Denault
@@ -11,8 +10,10 @@
 	* @ Version 1.0.1
 	* @ Since 4.0.0
 */
-class Validate{
-	
+
+declare(strict_types=1);
+class validate{
+
 /*
 	* Private Variables
 	* @since 4.0.0
@@ -20,25 +21,25 @@ class Validate{
 	private $_passed = false,
 			$_errors = array(),
 			$_db= null;
-	
+
 /*
 	* Validate Construct
 	* @since 4.0.0
-*/	
+*/
 	public function __construct(){
 		$this->_db = Database::getInstance();
 	}
 
 /*
 	* Validate Check
-	* @since 4.0.0	
+	* @since 4.0.0
 	* @param (String Source, String Items)
-*/	
-	public function check($source, $items =array()){
+*/
+	public function check(mixed $source,array $items =array()):object{
 
 		foreach($items as $item=> $rules){
-			
-			$n = (@strtolower($rules['name'])?$rules['name']:'Unknown');
+
+			$n = @(str::_strtolower($rules['name'])?$rules['name']:'Unknown');
 
 			foreach($rules as $rule => $rule_value){
 
@@ -76,7 +77,7 @@ class Validate{
 								$this->addError("{$rule_value} must match {$item}.");
 						break;
 						case 'changed':
-							if(strtolower($value) != strtolower($rule_value)){
+							if(str::_strtolower($value) != str::_strtolower($rule_value)){
 								$check =$this->_db->get(Config::get('table/users'),array('username', '=',$rule_value));
 
 								if($check->count())
@@ -109,7 +110,7 @@ class Validate{
 								$this->addError("{$n} is invalid.");
 						break;
 						case 'checkaganistlower':
-							if(!in_array(strtolower($value),$rule_value))
+							if(!in_array(str::_strtolower($value),cast::_array(str::_strtolower($rule_value))))
 								$this->addError("Please enter a valid option for {$n}.");
 						break;
 					}
@@ -127,12 +128,11 @@ class Validate{
 	* @since 4.0.0	
 	* @param (String Email)
 */		
-	public  function email($email){
+	public function email(string $email):bool{
 
-		if(	$email && strlen($email = trim($email)) > 0){	
-			if (filter_var($email, FILTER_VALIDATE_EMAIL)) 
+		if(filter_var($email, FILTER_VALIDATE_EMAIL) !== false)
 				return true;
-		}
+
 		$this->addError("Please enter a valid email");
 		return false;
 	}
@@ -142,7 +142,7 @@ class Validate{
 	* @since 4.0.0	
 	* @param (String Url)
 */		
-	private function url($uri){
+	private function url(string $uri):bool{
 		if (filter_var($uri, FILTER_VALIDATE_URL) === false) 
 			return true;
 		
@@ -151,94 +151,11 @@ class Validate{
 	}
 
 /*
-	* Validate Int
-	* @since 4.0.0	
-	* @param (Int Number)
-*/	
-	public static function _int ($in) {
-		if (is_array($in)) {
-			return array_map(
-				function ($in) {
-					return (int)$in;
-				},
-				$in
-			);
-		}
-		return (int)$in;
-	}
-	
-/*
-	* Validate Float
-	* @since 4.0.0	
-	* @param (Float Number)
-*/	
-	public static function _float ($in) {
-		if (is_array($in)) {
-			return array_map(
-				function ($in) {
-					return (float)$in;
-				},
-				$in
-			);
-		}
-		return (float)$in;
-	}
-
-/*
-	* Validate String
-	* @since 4.0.0	
-	* @param (String)
-*/	
-	public static function _string ($in) {
-		if (!is_array($in)) {
-			return (string)$in;
-		}
-		return array_map(
-			function ($in) {
-				return (string)$in;
-			},
-			$in
-		);
-	}
-
-/*
-	* Validate Array
-	* @since 4.0.0	
-	* @param (Array)
-*/	
-	public static function _array ($in) {
-		if (!is_array($in)) {
-			return (array)$in;
-		}
-		return array_map(
-			function ($in) {
-				return (array)$in;
-			},
-			$in
-		);
-	}
-	
-/*
-	* Validate if Item is Not Null
-	* @since 4.0.0	
-	* @param (String)
-*/	
-	public static function _isNull ($in) {
-		if (is_array($in)) {
-			foreach ($in as &$val) {
-				$val = self::_isNull($val);
-			}
-		} else {
-			$in = str_replace(chr(0), '', $in);
-		}
-		return $in;
-	}
-/*
 	* Validate Sqli Input Check
 	* @since 4.0.0	
-	* @param (String Location)
+	* @param (String String)
 */	
-	public function sqliCheck($string){
+	public function sqliCheck(string $string):object{
 	
 		$SQLiKey = array('information_schema', 'information_schema.tables', 'concat','version()','--','0x3a','/*','*/','char(');
 
@@ -255,23 +172,25 @@ class Validate{
 	* @since 4.0.0	
 	* @param (String Error)
 */		
-	private function addError($error){
+	private function addError(string $error):void{
 		$this->_errors[] = $error;
 	}
 
 /*
 	* Validate Return Errors
-	* @since 4.0.0	
+	* @since 4.0.0
+	* @Param ()
 */	
-	public function errors(){
+	public function errors():array{
 		return $this->_errors;
 	}
 
 /*
 	* Validate Return Passed
-	* @since 4.0.0	
+	* @since 4.0.0
+	* @Param ()
 */	
-	public function passed(){
+	public function passed():bool{
 		return $this->_passed;
 	}
 }

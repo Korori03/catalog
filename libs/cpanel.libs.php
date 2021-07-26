@@ -59,7 +59,7 @@ class Cpanel{
 		list($developerlist,$developerrl) = Cpanel::getDynamic('games','developer',$gameItem->developer);
 		list($publisherlist,$publisherrl) = Cpanel::getDynamic('games','publisher',$gameItem->publisher);
 		
-		$image =  (isset($_SERVER['HTTPS'] )? 'https://':'http://') . $_SERVER['HTTP_HOST'] . '/content/uploads/' .$gameItem->id . '_' .Slug::url_slug($gameItem->name) . '_' .Slug::url_slug($gameItem->region == 'United States'?'usa':($gameItem->region == 'Japanese'?'japan':$gameItem->region)). '.jpg';
+		$image =  (isset($_SERVER['HTTPS'] )? 'https://':'http://') . $_SERVER['HTTP_HOST'] . '/content/uploads/' .$gameItem->id . '_' .Slug::_url($gameItem->name) . '_' .Slug::_url($gameItem->region == 'United States'?'usa':($gameItem->region == 'Japanese'?'japan':$gameItem->region)). '.jpg';
 		if (!@fopen($image,'r')) 
 			$image = self::$data64;
 
@@ -88,7 +88,7 @@ class Cpanel{
 			'instructions'	=>	$gameItem->instructions == 1 || strtoupper($gameItem->instructions) == 'Y'?'checked="checked"':'',
 			'box'			=>	$gameItem->box == 1 || strtoupper($gameItem->box) == 'Y'?'checked="checked"':'',
 			'steelbook'		=>	$gameItem->steelbook == 1 || strtoupper($gameItem->steelbook) == 'Y'?'checked="checked"':'',
-			'breadcrumb'	=>	Webobjects::getBreadCrumbs($breadcrumbs) .'<li class="breadcrumb-item active"><a href="/games/'.Slug::url_slug($gameItem->brand).'/'.Slug::url_slug($gameItem->system).'/'.$gameItem->id.'-'.Slug::url_slug($gameItem->name).'">'.$gameItem->name.'</a></li>'
+			'breadcrumb'	=>	Webobjects::getBreadCrumbs($breadcrumbs) .'<li class="breadcrumb-item active"><a href="/games/'.Slug::_url($gameItem->brand).'/'.Slug::_url($gameItem->system).'/'.$gameItem->id.'-'.Slug::_url($gameItem->name).'">'.$gameItem->name.'</a></li>'
 		));
 		self::$page_title 	= 'Games' ;
 		return $game->show();

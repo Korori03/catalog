@@ -1,19 +1,18 @@
 <?php
 /*
-	* Korori-Gaming
 	* Uploader Class Set
 	* @Version 4.0.0
 	* Developed by: Ami (亜美) Denault
+*/
+/*
+	* Setup Uploader Class
+	* @since 4.0.0
 */
 
 ini_set('upload_max_filesize', '500M');
 ini_set('post_max_size', '500M');
 ini_set('memory_limit', '500M');
-
-/*
-	* Setup Uploader Class
-	* @since 4.0.0
-*/
+declare(strict_types=1);
 class Uploader{
 
 /*
@@ -26,31 +25,43 @@ class Uploader{
 					$_upload_temp_dir	=	"/content/uploads/temp/";
 
 
-	public static function ajax_clear_file($file_name){
-		$file_temp_path     = getcwd() ."/content/uploads/temp/" . $file_name;
+/*
+	* Clear File if Exist
+	* @since 4.0.0
+	* @param (String FileName)
+*/
+	public static function ajax_clear_file(string $file_name):void{
+		$file_temp_path     = getcwd() . self::$_upload_temp_dir . $file_name;
 		@unlink($file_temp_path);
 	}
 
-	public static function ajax_move_file($file_name,$pre_file){
+/*
+	* Move File to Correct Location
+	* @since 4.0.0
+	* @param (String FileName,String NewName)
+*/
+	public static function ajax_move_file(string $file_name,string $pre_file):void{
 		
-		$file_temp_path     = getcwd() ."/content/uploads/temp/" . $file_name;
+		$file_temp_path     = getcwd() .self::$_upload_temp_dir . $file_name;
 		
-		$path_parts = pathinfo($file_temp_path);
-		
-		$file_path     = getcwd() ."/content/uploads/" . $pre_file.'_'.Slug::url_slug($path_parts['filename']).'.'.$path_parts['extension'];
+		$path_parts 		= pathinfo($file_temp_path);
+
+		$file_path     		= getcwd() . self::$_upload_dir . $pre_file.'_'.Slug::_url($path_parts['filename']).'.'.$path_parts['extension'];
 		
 		if(rename($file_temp_path, $file_path))
 			@unlink($file_temp_path);
 		
-		
-		echo Json::returnJson(true,"/content/uploads/" . $pre_file.'_'.Slug::url_slug($path_parts['filename']).'.'.$path_parts['extension']);
-
+		echo Json::returnJson(true, self::$_upload_dir . $pre_file.'_'.Slug::_url($path_parts['filename']).'.'.$path_parts['extension']);
 	}
 
+/*
+	* Upload File
+	* @since 4.0.0
+	* @param (String File,Object FileData)
+*/
+	public static  function ajax_upload_file(string $file,mixed $file_data):void{
 
-	public static  function ajax_upload_file($file,$file_data){
-
-		$file_path     = getcwd() ."/content/uploads/temp/".$file;
+		$file_path     = getcwd() .self::$_upload_temp_dir.$file;
 
 		$file_data     = self::decode_chunk( $file_data );
 
@@ -64,30 +75,31 @@ class Uploader{
 	}
 
 
-
-	private static function decode_chunk( $data ) {
+/*
+	* Decode Chuck
+	* @since 4.0.0
+	* @param (Object Data)
+*/
+	private static function decode_chunk(mixed $data ):bool {
 		$data = explode( ';base64,', $data );
 
-		if ( ! is_array( $data ) || ! isset( $data[1] ) ) {
+		if (!is_array( $data ) || !isset($data[1]) )
 			return false;
-		}
 
 		$data = base64_decode( $data[1] );
-		if ( ! $data ) {
+		if (!$data)
 			return false;
-		}
 
 		return $data;
 	}
 
 /*
 	* Resize image
-	* @since 4.0.0	
+	* @since 4.0.0
 	* @param (String File Input Name, Integer Width, String Filename,Integer Quality, Integer Height)
 */
-	public function resizeImage($pathToImage, $imagewidth,$filename,$quality = 100,$heighttype = 'auto' ){
-		$ext =  explode('.',$filename);
-		$ext = strtolower(end($ext));
+	public function resizeImage(string $pathToImage,int $imagewidth,string $filename,int $quality = 100,string $heighttype = 'auto' ):void{
+		$ext =  file::_extension($filename);
 		
 		if($ext === 'png')
 			$img = imagecreatefrompng( "{$pathToImage}{$filename}" );
@@ -95,22 +107,22 @@ class Uploader{
 			$img = imagecreatefromgif( "{$pathToImage}{$filename}" );
 		else
 			$img = imagecreatefromjpeg( "{$pathToImage}{$filename}" );
-		
+
 		
 		$width = imagesx( $img );
 		$height = imagesy( $img );
 
 		$new_width = $imagewidth;
-		
+
 		if($heighttype == 'auto')
-			$new_height = floor( $height * ( $imagewidth / $width ) );
+			$new_height = cast::_int(floor( $height * ( $imagewidth / $width ) ));
 		else
-			$new_height = $heighttype;
+			$new_height = cast::_int($heighttype);
 			
 		if($imagewidth == 'auto')
-			$new_width = floor( $width * ( $heighttype / $height ) );
+			$new_width = cast::_int(floor( $width * ( $heighttype / $height ) ));
 		else
-			$new_width = $imagewidth;	
+			$new_width = cast::_int($imagewidth);
 			
 			
 		$tmp_img = imagecreatetruecolor( $new_width, $new_height );
@@ -129,9 +141,9 @@ class Uploader{
 	* @since 4.0.0	
 	* @param (String File Path to Image, String File Path to Thumb,Integer Width, String Filename)
 */
-	public function createThumbs($pathToImage, $pathToThumb, $thumbWidth,$filename ) 
+	public function createThumbs(string $pathToImage,string  $pathToThumb,int $thumbWidth,string $filename ) :void
 	{
-		$ext = $this->getExtension($filename);
+		$ext = file::_extension($filename);
 
 		if($ext === 'png')
 			$img = imagecreatefrompng( "{$pathToImage}{$filename}" );
@@ -145,7 +157,7 @@ class Uploader{
 		$height = imagesy( $img );
 
 		$new_width = $thumbWidth;
-		$new_height = floor( $height * ( $thumbWidth / $width ) );
+		$new_height = cast::_int(floor( $height * ( $thumbWidth / $width ) ));
 
 		$tmp_img = imagecreatetruecolor( $new_width, $new_height );
 		
@@ -162,9 +174,9 @@ class Uploader{
 /*
 	* Remove File
 	* @since 4.0.0	
-	* @param (String File Path)
+	* @param (String FilePath)
 */	
-	public static function removeFile($path){
+	public static function removeFile(string $path):void{
 		if(file_exists($path)){	
 			$fh = fopen($path, 'w');	
 			fclose($fh);
@@ -172,23 +184,13 @@ class Uploader{
 		}
 	}	
 
-/*
-	* Get Extension
-	* @since 4.0.0	
-	* @param (String File)
-*/
-	public static function getExtension($str) {
-		
-		$str_array = explode('.',$str);
-		return strtolower(end($str_array));
-	}
 
 /*
 	* Create Guid
 	* @since 4.0.0	
-	* @param (String)
-*/	
-	public function create_guid($namespace = '') {     
+	* @param (String NameSpace)
+*/
+	public function create_guid(mixed $namespace = '') {
 		static $guid = '';
 		$uid = uniqid("", true);
 		$data = $namespace;
@@ -201,7 +203,7 @@ class Uploader{
 		$data .= time();
 		
 		$hash = strtoupper(hash('ripemd128', $uid . $guid . md5($data)));
-		$guid = substr($hash,  0,  8) . 
+		$guid = substr($hash,  0,  8) .
 				substr($hash,  8,  4) .
 				substr($hash, 12,  4) .
 				substr($hash, 16,  4) .
@@ -212,10 +214,11 @@ class Uploader{
 
 /*
 	* Type Extension
-	* @since 4.0.0	
+	* @since 4.0.0
+	* @param (String Path)
 */	
-	public function typeExt($path) {
-		$extension =  strtolower($this->getExtension($path));	
+	public function typeExt(string $path) {
+		$extension =  strtolower(file::_extension($path));
 		$type ='file';
 		if($extension === 'png' || $extension === 'gif' || $extension === 'jpg' || $extension === 'jpeg'){
 			$type = 'image';
@@ -229,7 +232,7 @@ class Uploader{
 		* @since 4.0.0	
 		* @param (String File Input Name, String Folder, String Types, Integer Size, Integer Width, String Optional, Integer Height)
 	*/
-	public static function fileUpload($file_id, $folder="/content/uploads/", $types="",$sizelimit) {
+	public static function fileUpload(mixed $file_id,string $folder="/content/uploads/",string $types="",int $sizelimit) {
 			
 		$file_name = '';	
 		$query = false;
@@ -270,28 +273,27 @@ class Uploader{
 			if(!$_FILES[$file_id]['size']) { 
 				self::removeFile($folder . $file_name);
 				self::addError("Empty file found - please use a valid file.");
-
 			}
 			else{
 				$query = true;
 			}
-
 		}
 		return array($query,self::$_errors,$file_name);
 	}
 
 	/*
 		* Add Error
-		* @since 4.0.0	
+		* @since 4.0.0
 		* @param (String Error)
-	*/	 
-	private static function addError($error){
+	*/
+	private static function addError(string $error){
 		self::$_errors[] = $error;
 	}
 
 	/*
 	* Error Call
-	* @since 4.0.0	
+	* @since 4.0.0
+	* @param ()
 	*/
 	public static function errors(){
 		return self::$_errors;

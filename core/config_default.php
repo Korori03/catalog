@@ -1,6 +1,6 @@
 <?php
-
 $GLOBALS['config']=array(
+
 	'mysql'=>array(
 		'host'=>'host',
 		'username'=>'username',
@@ -11,9 +11,12 @@ $GLOBALS['config']=array(
 		'key'=>'50 char hash here',
 		'bypassKey'=>'50 char hash here',
 	),
+	'domains'=>
+	'{
+	}',
 	'remember'=>array(
 		'cookie_name'=>'hash',
-		'cookie_expiry'=>18144000
+		'cookie_expiry'=>604800
 	),
 	'session'=>array(
 		'session_name'=>'user'
@@ -28,7 +31,6 @@ $GLOBALS['config']=array(
 			'last_one'=>array('start'=>{Number},'length'=>{Number}),
 			'last_two'=>array('start'=>{Number},'length'=>{Number}),
 		),
-
 		'auth_key'=>'40 char hash here',
 		'salt'=>'40 char hash here',
 		'saltedAlpha'=> array(
@@ -76,18 +78,60 @@ $GLOBALS['config']=array(
 		'WEEK_IN_SECONDS'=>604800
 	),
 	'table'=>array(
-		'users'=>'users',
-		'options'=>'options'
+		'users'=>'XXXXXXXXX',
+		'news'=>'XXXXXXXX',
+		'content'=>'XXXXXXX',
+		'calendar'=>'XXXXXXXXX',
+		'subscriptions'=>'XXXXXX',
+		'information'=>'XXXXXXXX',
+		'links'=>'XXXXXXXXX',
+		'files'=>'XXXXXXXXX',
+		'closings'=>'XXXXXXXX',
+		'jobs'=>'XXXXXXXXXX',
+		'deptid'=>'XXXXXXXXX',
+		'sections'=>'XXXXXXXXX',
+		'email'=>'XXXXXXXX',
+		'recreation_info'=>'XXXXXXXXX',
+		'deptlink'=>'XXXXXXX',
+		'minutes'=>'XXXXXXXX',
+		'agenda'=>'XXXXXXXX',
+		'meetings'=>'XXXXXXXXX',
+		'mim'=>'XXXXXXXX',
+		'commissioners'=>'XXXXXXXXXX',
+		'revenue'=>'XXXXXXX',
+		'revenue_old'=>'XXXXXXXXX',
+		'lastupdate'=>'XXXXXXXXX',
+		'forms'=>'XXXXXXXX',
+		'recreation_images'=>'XXXXXXXX',
+		'recreation_type'=>'XXXXXXXX',
+		'backup_content'=>'XXXXXXX',
+		'online_payments'=>'XXXXXXXXXXX',
+		'etax'=>'XXXXXXXXX',
+		'search'=>'XXXXXXXX',
+		'cal_info'=>'XXXXXX',
+		'options'=>'XXXXXXXXXXXX',
+		'comvideos'=>'XXXXXXXXX'
 	),
 	'settings'=>array(
 		'word_limit'=>60
 	),
+	'api'=>array(
+		'username'=>'XXXXXXXXXX',
+		'password'=>'XXXXXXXXXXXXXX'
+	),
 	'emailer'=>array(
 		'sender'=>array(
-			'name'=>'AAAAAA',
-			'email'=>'AAAAA@XXXX.EEE'
+			'name'=>'XXXXXXXXXXXXXXXXXXXX',
+			'email'=>'XXXXX@XXXXXXXXX.XXXXX'
+		),
+		'job'=>array(
+			'name'=>'Houston County',
+			'email'=>'XXXXXXXXXXX@XXXXXXXXXXX.XXXX'
+		),
+		'roadbridge'=>array(
+			'name'=>'XXXXXXXXXXXXXX',
+			'email'=>'XXXXXX@XXXXXXXXXXX.XXXXXXXXX'
 		)
 	)
 );
-
 ?>

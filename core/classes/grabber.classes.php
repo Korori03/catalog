@@ -1,6 +1,5 @@
 <?php
 /*
-	* Korori-Gaming
 	* Grabber Class Set
 	* @Version 1.0.0
 	* Developed by: Ami (亜美) Denault
@@ -8,14 +7,15 @@
 /*
 	* Grabber
 	* @Since 4.0.1
-*/	
+*/
+declare(strict_types=1);
 class Grabber{
 /*
 	* Curl Function
 	* @Since 1.1.4
 	* @Param (Url String)
 */
-	public static function fromURL($url){
+	public static function fromURL(string $url):string|void{
 		$curl = curl_init();		
 		$userAgent = 'Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1; .NET CLR 1.1.4322)'; 
 
@@ -40,7 +40,7 @@ class Grabber{
 	* @Since 1.0.0
 	* @Param (Url String,String Dom, String Object Class in html)
 */	
-	public static function fromUrlData($url,$DOM,$class){
+	public static function fromUrlData(string $url,string $DOM,string $class):array{
 		
 		$str = self::fromURL($url);
 		$doc = new DOMDocument();

@@ -1,7 +1,6 @@
-<?php 
+<?php
 
 /*
-	* Korori-Gaming
 	* User Class Set
 	* @Version 4.0.0
 	* Developed by: Ami (亜美) Denault
@@ -10,66 +9,65 @@
 	* Setup User Class
 	* @since 4.0.0
 */
-class User{
 
-/*
+declare(strict_types=1);
+class User
+{
+
+	/*
 	* Private Variables
 	* @since 4.0.0
-*/	
+*/
 	private $_db,
-			$_data,
-			$_sessionName,
-			$_sessionVal,
-			$_isLoggedIn,
-			$_permissions,
-			$_useritem,
-			$_usersettings;
+		$_data,
+		$_sessionName,
+		$_isLoggedIn,
+		$_permissions,
+		$_useritem,
+		$_usersettings;
 
-/*
+	/*
 	* Construct User
 	* @since 4.0.0
 	* @Param (String/Integer User)
 */
-	public function __construct($user = null){
+	public function __construct(mixed $user = null)
+	{
+
 		$this->_db = Database::getInstance();
-		$this->_sessionName = Cookie::exists('session/user')?Cookie::get('session/user'):'';
-		$this->_sessionVal =  Cookie::exists('session/sessionid')?Cookie::get('session/sessionid'):'';
-		
-		if(!empty($this->_sessionName) && !empty($this->_sessionVal)){
-			$data = $this->_db->query("SELECT * FROM " . Config::get('table/users') . " WHERE `session` ='" . $this->_sessionVal . "' AND `username` = '" . $this->_sessionName . "' LIMIT 1;");
-			if($data->count()){
-				$this->_isLoggedIn = true;
-				$this->find($this->_sessionName);
+		$this->_sessionName = Config::get('session/session_name');
+		if (!$user) {
+			if (Session::exists($this->_sessionName)) {
+				$user = Session::get($this->_sessionName);
+				if ($this->find($user))
+					$this->_isLoggedIn = true;
 			}
-		}
-		else
+		} else
 			$this->find($user);
-		
 	}
 
-/*
+	/*
 	* Create User
 	* @since 4.0.0
 	* @Param (Array Fields)
 */
-	public function create($fields = array()){
-		if(!$this->_db->insert(Config::get('table/users'),$fields))
+	public function create(array $fields = array()): void
+	{
+		if (!$this->_db->insert(Config::get('table/users'), $fields))
 			throw new Exception('There was a problem creating an account.');
-		
 	}
 
-/*
+	/*
 	* Find User
 	* @since 4.0.0
 	* @Param (String/Integer User)
 */
-	public function find($user = null){
-
-		if($user){
-			$field = (is_numeric($user))?'id':'username';
-			$data = $this->_db->query("SELECT * from " . Config::get('table/users') . " WHERE " . $field." = ?;",array($user));
-
-			if($data->count()){
+	public function find(mixed $user = null): bool
+	{
+		if ($user) {
+			$field = (is_numeric($user)) ? 'id' : 'username';
+			$data = $this->_db->get(Config::get('table/users'), array($field, '=', $user));
+			if ($data->count()) {
 				$this->_data = $data->first();
 				$this->_permissions = $data->first()->permission;
 				return true;
@@ -78,36 +76,35 @@ class User{
 		return false;
 	}
 
-/*
+	/*
 	* User Login
 	* @since 4.0.0
 	* @Param (String Username, String Password, Boolean Remember)
 */
-	public function login($username = null, $password = null,$remember=false){
-
-		if(!$username && !$password && $this->exists())
-			Session::put($this->_sessionName,$this->data()->id);
-		else{
+	public function login(mixed $username = null,string $password = null,bool $remember = false): bool
+	{
+		if (!$username && !$password && $this->exists())
+			Session::put($this->_sessionName, $this->data()->id);
+		else {
 			$user = $this->find($username);
-			
-			if($user){
-				if($this->data()->password === Hash::make($password)){
-						
-					Session::put($this->_sessionName,$this->data()->id);
-					if($remember){
-						$hash = Hash::generateRandomString(25);
-						$this->_db->query("UPDATE users SET `session` = '". $hash . "' WHERE id = '". $this->data()->id . "';");
 
-						Cookie::delete('session/user');
-						Cookie::delete('session/sessionid');
-						Cookie::put('session/user',$username,Config::get('remember/cookie_expiry'));
-						Cookie::put('session/sessionid',$hash,Config::get('remember/cookie_expiry'));	
-						
-						$this->_sessionName = Cookie::get('session/user');
-						$this->_sessionVal = Cookie::get('session/sessionid');	
-						return true;	
+			if ($user) {
+
+				if ($this->data()->password === Hash::make($password)) {
+					Session::put($this->_sessionName, $this->data()->id);
+
+					if ($remember) {
+						$hash = Hash::generateRandomString(35);
+						$hashCheck = $this->_db->get('user_session', array('user_id', '=', $this->data()->salt));
+
+						if (!$hashCheck->count())
+							$this->_db->insert('users_session', array('user_id' => $this->data()->id, 'hash' => $hash));
+						else
+							$hash = $hashCheck->first()->hash;
+
+						Cookie::put($this->_cookieName, $hash, Config::get('remember/cookie_expiry'));
 					}
-					
+
 					return true;
 				}
 			}
@@ -115,77 +112,83 @@ class User{
 		return false;
 	}
 
-/*
+	/*
 	* User Has Permission
 	* @since 4.0.0
 	* @Param (String Key)
 */
-	public function hasPermission($key){
-		if(strlen($this->_permissions) > 0){
-			$permission = json::decode($this->_permissions,true);
-			if(is_numeric($permission[$key]) && ($permission[$key] == 0 || $permission[$key] == 1))
-				return true;
-			else 
-				return $permission[$key];
+	public function hasPermission(string $key): bool
+	{
+		if (!is_null($this->_permissions)) {
+			if (strlen(cast::_string($this->_permissions)) > 0) {
+				$permission = json_decode($this->_permissions, true);
+				if (filter::bool(cast::_string($permission[$key])))
+					return true;
+			}
 		}
 		return false;
 	}
 
-/*
+	/*
 	* User Has Item
 	* @since 4.0.1
 	* @Param (String Key)
-*/	
-	public function hasUserItem($key){
-		if(strlen($this->_useritem) > 0){
-			$permission = json::decode($this->_useritem,true);
+*/
+	public function hasUserItem(string $key): string
+	{
+		if (strlen($this->_useritem) > 0) {
+			$permission = json_decode($this->_useritem, true);
 			return $permission[$key];
 		}
 		return '';
 	}
 
-/*
+	/*
 	* User Settings
 	* @since 4.0.1
 	* @Param (String Key)
-*/	
-	public function hasUserSettings($key){
-		if(strlen($this->_usersettings) > 0){
-			$permission = json::decode($this->_usersettings,true);
+*/
+	public function hasUserSettings(string $key): string
+	{
+		if (strlen($this->_usersettings) > 0) {
+			$permission = json_decode($this->_usersettings, true);
 			return $permission[$key];
 		}
 		return '';
 	}
-/*
+	/*
 	* User Exists
 	* @since 4.0.0
+	* @Param ()
 */
-	public function exists(){
-		return (!empty($this->_data))?true:false;
+	public function exists(): bool
+	{
+		return (!empty($this->_data)) ? true : false;
 	}
 
-/*
+	/*
 	* User Logout
 	* @since 4.0.0
+	* @Param ()
 */
-	public function logout(){
-		$this->_db->query("Update " . Config::get('table/users') . " SET `session` = '' WHERE id = ?", array($this->data()->id));
+	public function logout(): void
+	{
+		$this->_db->delete('users_session', array('user_id', '=', $this->data()->id));
 		$this->_isLoggedIn = false;
-		$this->_data ='';
-		$this->_permissions= '';
-		Session::delete($this->_sessionName);
+		$this->_data = '';
+		$this->_permissions = '';
+		SESSION::delete($this->_sessionName);
 		Cookie::delete($this->_cookieName);
-		Cookie::delete('session/user');
-		Cookie::delete('session/sessionid');
 	}
 
-		
-/*
+
+	/*
 	* Password Check
 	* @since 4.0.0	
-	* @param (String,Int Length)
-*/		
-	public static function password_check ($password, $min_length = 4) {
+	* @param (String Password,Int Length)
+*/
+	public function password_check(string $password,int $min_length = 4): int
+	{
 		$password = preg_replace('/\s+/', ' ', $password);
 		$strength = 0;
 		if (strlen($password) >= $min_length) {
@@ -215,12 +218,13 @@ class User{
 		return $strength;
 	}
 
-/*
+	/*
 	* Generate Password
 	* @since 4.0.0	
 	* @param (Int Length,Int Strength)
-*/		
-	public function password_generate ($length = 10, $strength = 5) {
+*/
+	public function password_generate(int $length = 10,int $strength = 5): string
+	{
 		static $special = [
 			'~', '!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_',
 			'=', '+', '|', '\\', '/', ';', ':', ',', '.', '?', '[', ']', '{', '}'
@@ -266,7 +270,7 @@ class User{
 				$password[] = $symbols[random_int(0, $size)];
 			}
 			shuffle($password);
-			if (self::password_check(implode('', $password)) == $strength) {
+			if ($this->password_check(implode('', $password)) == $strength) {
 				return implode('', $password);
 			}
 			$password = [];
@@ -274,20 +278,23 @@ class User{
 		return '';
 	}
 
-/*
+	/*
 	* User Data
 	* @since 4.0.0
+	* @Param ()
 */
-	public function data(){
+	public function data(): array|object|null
+	{
 		return $this->_data;
 	}
 
-/*
+	/*
 	* User Logged In
 	* @since 4.0.0
-*/	
-	public function isLoggedIn(){
-		return $this->_isLoggedIn;
+	* @Param ()
+*/
+	public function isLoggedIn(): bool
+	{
+		return cast::_bool($this->_isLoggedIn);
 	}
 }
-?>

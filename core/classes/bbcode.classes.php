@@ -1,15 +1,11 @@
 <?php
-
 /*
-	* Korori-Gaming
-	* BBCode Class Set
+	* Setup BBcode Class
 	* @Version 2.1.0
 	* Developed by: Ami (亜美) Denault
 */
-/*
-	* Setup BBcode Class
-	* @since 2.1
-*/
+
+declare(strict_types=1);
 class BBCODE{
 
 /*
@@ -23,10 +19,11 @@ class BBCODE{
 
 */	
 
-	public static function format($text) {
+	public static function format(string $text): string{
 	
 		$text = html_entity_decode ($text,ENT_QUOTES,'UTF-8');				
 	    
+		$text = str::_toAscii($text);
 		$bbcodes = array(
 			'/\[br\]/is' => '<br/>',
 			'/\[b\](.+?)\[\/b\]/is' => '<strong>$1</strong>',
@@ -54,10 +51,10 @@ class BBCODE{
 			'/\[sub\](.+?)\[\/sub\]/is' => '<span class=\'subScript\'>$1</span>',
 			'/\[sup\](.+?)\[\/sup\]/is' => '<span class=\'supScript\'>$1</span>',
 			'/\[hr\]/iUs' => '<hr />',	
-			'/\[video\](.+?)\[\/video\]/is' => '<video height="410" width="600" src="$1" controls="" preload=""></video>',	
+			'/\[video\](.+?)\[\/video\]/is' => '<video height="410" width="600" src="$1" controls="" preload=""></video>',
 		);
 		$bbcodes_fun = array(
-			'/\[table\=(.+?)\](.+?)\[\/table\]/is' => 'bbcode_table($m[1],$m[2])',	
+			'/\[table\=(.+?)\](.+?)\[\/table\]/is' => 'bbcode_table($m[1],$m[2])',
 			'/\[youtube\](.+?)\[\/youtube\]/is' => 'bbcode_youtube($m[1])',
 			'/\[list\](.+?)\[\/list\]/is' => 'bbcode_list($m[1])',
 			'/\[list\=(lower-roman|upper-roman|lower-alpha|upper-alpha|bullet)\](.+?)\[\/list\]/is' => 'bbcode_list($m[2],$m[1])',
@@ -65,14 +62,13 @@ class BBCODE{
 			'/\[url\](.+?)\[\/url\]/is' => 'bbcode_url($m[1],$m[1])',
 			'/\[link\=(.+?)\](.+?)\[\/link\]/is' => 'bbcode_url($m[1],$m[2])',
 			'/\[link\](.+?)\[\/link\]/is' => 'bbcode_url($m[1],$m[1])',
-			'/\[deptEmail\=(.+?)\](.+?)\[\/deptEmail\]/is' => 'bbcode_url($m[1],$m[2])',
 			'/\[img\](.+?)\[\/img\]/is' => 'img_src($m[1])',
 			'/\[img width=(.+?) height=(.+?)\](.+?)\[\/img\]/is' => 'img_src($m[1],$m[2],$m[3])',
 			'/\([0-9]{3}\)([-.\s])[0-9]{3}([-.\s])[0-9]{4}/is'=>'tel_href($m[1])',
 			'/[0-9]{3}([-.\s])[0-9]{3}([-.\s])[0-9]{4}/is'=>'tel_href($m[1])'
 		);
 		foreach ($bbcodes_fun as $search => $replace_fun){
-			$fun = explode('(',$replace_fun); 
+			$fun = explode('(',$replace_fun);
 			$getfunction = $fun[0];
 			if (function_exists($getfunction)){
 				if($getfunction == 'bbcode_url'){
@@ -133,14 +129,12 @@ class BBCODE{
 	* @since 2.1	
 	* @Param (String Link, String Title)
 */	
-	function bbcode_url($link,$title){
-		$url='';
+	function bbcode_url(string $link,string $title): string{
+		$url = '<a href="'.  str_replace(' ','',str::_trim($link)) . '">'.$title.'</a>';
 		
 		if(substr($link,0,1) =='/')
 			$url =  '<a href='.$link . '>'.$title.'</a>';
-		else{
-			$url = '<a href="'.  str_replace(' ','',trim($link)) . '">'.$title.'</a>';
-		}
+			
 		return $url;
 	}
 
@@ -149,28 +143,25 @@ class BBCODE{
 	* @Since 3.1.1
 	* @Param (String Url)
 */		
-	function isValidUrl($url){
+	function isValidUrl(string $url): bool{
         if(!$url || !is_string($url))
             return false;
 
 		if( ! preg_match('/^http(s)?:\/\/[a-z0-9-]+(.[a-z0-9-]+)*(:[0-9]+)?(\/.*)?$/i', $url) )
             return false;
 
-        if($url =='http://www.bcbsal.org/' || $url == 'http://www.alatelco.org/')
-        	return true;
-
          if(getHttpResponseCode_using_curl($url) != 200)
             return false;
         
         return true;
     }
-	
+
 /*
 	* Get Http Response 
 	* @Since 3.1.1
 	* @Param (String Url, Bool Follow Redirects)
 */	
-    function getHttpResponseCode_using_curl($url, $followredirects = true){
+    function getHttpResponseCode_using_curl(string $url,bool $followredirects = true): string{
         if(! $url || ! is_string($url))
             return false;
         
@@ -182,7 +173,7 @@ class BBCODE{
         @curl_setopt($ch, CURLOPT_NOBODY         ,true);
         @curl_setopt($ch, CURLOPT_RETURNTRANSFER ,true);
 		
-		
+
 		@curl_setopt($ch,CURLOPT_TIMEOUT,3);
 		@curl_setopt($ch,CURLOPT_CONNECTTIMEOUT,3);
         if($followredirects){
@@ -203,52 +194,32 @@ class BBCODE{
 
 
 /*
-	* Get Http Response using Headers
-	* @Since 3.1.1
-	* @Param (String Url, Bool Follow Redirects)
-*/
-    function getHttpResponseCode_using_getheaders($url, $followredirects = true){
-        if(! $url || ! is_string($url))
-            return false;
-        
-        $headers = @get_headers($url);
-        if($headers && is_array($headers)){
-            if($followredirects)
-                $headers = array_reverse($headers);
-            
-            foreach($headers as $hline){
-                if(preg_match('/^HTTP\/\S+\s+([1-9][0-9][0-9])\s+.*/', $hline, $matches) ){// "HTTP/*** ### ***"
-                    $code = $matches[1];
-                    return $code;
-                }
-            }
-            return false;
-        }
-        return false;
-    }
-
-/*
 	* BBcode Table
 	* @since 2.1
 	* @param Rows, Number of Items [c], Width of table, alignement of table
 */	
-	function bbcode_table($rows, $items, $align = NULL){
-		$rows = (int)$rows;
+	function bbcode_table(int $rows,string $items,string $align = NULL):string{
+		$rows = cast::_int($rows);
 		$objects = explode('[c]',$items);
 		$table = '<table class="rounded-corner" cellpadding="0" cellspacing="0" '. (($align !=NULL)? 'margin-left: auto;margin-right: auto;': '').'><tbody>';
 		$rc = 0;
+
 		for($x = 0; $x < count($objects);$x++){	
 			if($rc == 0)
 				$table .= '<tr>';
 				
 			$table .='<td>'. $objects[$x] . '</td>';
 				
-			if($rc == $rows-1){
-				$table .= '</tr>';
-				$rc = 0;
+			if(count($objects) - 1 == $x && $rc <= $rows - 2)
+				$table .= '<td></td></tr>';
+			else{
+				if($rc == $rows - 1){
+					$table .= '</tr>';
+					$rc = 0;
+				}
+				else
+					$rc++;
 			}
-			else
-				$rc++;
 		}
 		$table .= '</tbody></table>';
 		return $table;
@@ -259,7 +230,7 @@ class BBCODE{
 	* @since 2.1
 	* @param Number of Items [*], Style (bullet)
 */	
-	function bbcode_list($items,$style = NULL){
+	function bbcode_list(string $items,string $style = NULL):string{
 	
 		$objects = explode('[*]',$items);
 		$list = '<ol'. (($style !=NULL)? ' style="list-style-type:'.(($style == 'bullet')? 'disc' : $style).';"': '').'>';
@@ -267,7 +238,7 @@ class BBCODE{
 		for($x = 1; $x < count($objects);$x++)
 			$list .='<li>'. $objects[$x] . '</li>';	
 
-		$list .= '</ol>';																		
+		$list .= '</ol>';
 		return $list;
 	}
 
@@ -277,7 +248,7 @@ class BBCODE{
 	* @param (Input String)
 
 */	
-	function makeASCII($a){ 
+	function makeASCII(string $a):string{
 		$a = preg_replace("/[^A-Za-z0-9\s\s+\.\:\-\/%+\(\)\*\&\$\#\!\@\?\=\"\';\n\t\r]/"," ",$a);
 		return $a; 
 	} 
@@ -288,9 +259,9 @@ class BBCODE{
 	* @param (Input String Telephone)
 
 */		
-	function tel_href($tel){
+	function tel_href(string $tel):string{
 		$tel_parse = trim(str_replace(array("(",")","-","."," ","<br/>","[br]","]","[",":"),"",trim($tel)));
-		return "<a href='tel:$tel_parse'>$tel</a>";
+		return "<span  onkeydown=\"navigateLink(event)\" onclick=\"navigateLink(event)\" role=\"link\" class=\"link\" href='tel:$tel_parse'>$tel</span>";
 	}
 
 /*
@@ -298,11 +269,11 @@ class BBCODE{
 	* @since 3.1
 	* @param (String Source, Integer Width, Integer Height)
 */	
-	function img_src($src,$width=0,$height=0){
+	function img_src(string $src,int $width=0,int $height=0):string{
 		$src_parse = str_replace(array(" ","%20"),"",trim($src));
 
 		if(substr($src_parse,0,1) == '/'){
-			if(file_exists(substr($src_parse,1))){
+			if(file::_exist(substr($src_parse,1))){
 				if($width != 0 && $height != 0)
 					return '<img src="'.$src_parse.'" alt="image" style="width:'.$width.'px; height:'.$height.'px;" />';
 				else
@@ -325,7 +296,7 @@ class BBCODE{
 	* @since 2.1
 	* @param (Video Id String)
 */
-	function bbcode_youtube($videoid) {  
+	function bbcode_youtube(string $videoid):string{
 
 		try{	
 			$feedURL = 'http://gdata.youtube.com/feeds/api/videos/'.$videoid;

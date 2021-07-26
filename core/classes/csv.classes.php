@@ -1,7 +1,6 @@
 <?php
 
 /*
-	* Korori-Gaming
 	* Csv Class Set
 	* @Version 1.0.0
 	* Developed by: Ami (亜美) Denault
@@ -11,7 +10,7 @@
 	* CSV Template Class
 	* @since 1.0.0
 */	
-
+declare(strict_types=1);
 class Csv {
 
 /*
@@ -24,7 +23,7 @@ class Csv {
 	* @since 1.0.0
 */
 	public function __construct() {
-		$_db = Database::getInstance();
+		self::$_db = Database::getInstance();
 	}
 
 /*
@@ -32,7 +31,7 @@ class Csv {
 	* @since 4.0.0
 	* @Param (String file path, Array Options)
 */	
-	public static function toMysql($csv_path, $options = array())
+	public static function toMysql(string $csv_path,array $options = array()):string|bool
 	{
 		extract($options);
 		
@@ -47,7 +46,7 @@ class Csv {
 		
 		if(!$fields){
 			$fields = array_map(function ($field){
-				return strtolower(preg_replace("/[^A-Z0-9]/i", '', $field));
+				return str::_strtolower(preg_replace("/[^A-Z0-9]/i", '', $field));
 			}, fgetcsv($csv_handle, 0, $delimiter));
 		}
 		
@@ -55,22 +54,21 @@ class Csv {
 			return "$field TEXT NULL";
 		}, $fields));
 		
-		
+
 		$create_table_sql = "CREATE TABLE IF NOT EXISTS $table ($create_fields_str)";
-		$this->_db::query($create_table_sql);
+		self::$_db::query($create_table_sql);
 		
 		$insert_fields_str = join(', ', $fields);
 		$insert_values_str = join(', ', array_fill(0, count($fields),  '?'));
 		$insert_sql = "INSERT INTO $table ($insert_fields_str) VALUES ($insert_values_str)";
-		
-		$insert_sth = $this->_db::prepare($insert_sql);
-		
+
+		$insert_sth = self::$_db::prepare($insert_sql);
+
 		while (($data = fgetcsv($csv_handle, 0, $delimiter)) !== FALSE) {
-			$this->_db::execute($data);
+			self::$_db::execute($data);
 		}
 
 		fclose($csv_handle);
-		$this->close();
 		return true;
 	}
 }

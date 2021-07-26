@@ -37,15 +37,15 @@ class WebObjects{
 			for($x = 0;$x < count($results);$x++){
 			
 				if($maintitle !== strtolower($tcat->results()[$x]->main)){
-					$li .= '<li class="hasChild"><a href="javascript:;"><i class="icon s-18"><svg><use xlink:href="#icon-'. Slug::url_slug(strtolower($tcat->results()[$x]->main)).'"></use></svg> </i><span>'.$tcat->results()[$x]->main.'</span></a>';
+					$li .= '<li class="hasChild"><a href="javascript:;"><i class="icon s-18"><svg><use xlink:href="#icon-'. Slug::_url(strtolower($tcat->results()[$x]->main)).'"></use></svg> </i><span>'.$tcat->results()[$x]->main.'</span></a>';
 					$li .= '<ul class="acc-menu" style="display: none;">';
-					$li .= '<li><a href="/'. Slug::url_slug(strtolower($tcat->results()[$x]->main)) .'"><span>'.$tcat->results()[$x]->main. ' ' . 'Main Page</span></a></li>';	
+					$li .= '<li><a href="/'. Slug::_url(strtolower($tcat->results()[$x]->main)) .'"><span>'.$tcat->results()[$x]->main. ' ' . 'Main Page</span></a></li>';	
 
 					$maintitle = strtolower($tcat->results()[$x]->main);
 				}
 
 				if($subtitle !== strtolower($tcat->results()[$x]->subitem)){
-					$li .= '<li><a href="/' . Slug::url_slug($tcat->results()[$x]->main) . '/' . Slug::url_slug($tcat->results()[$x]->subitem)  .'">' . $tcat->results()[$x]->subitem .'</a> </li>';
+					$li .= '<li><a href="/' . Slug::_url($tcat->results()[$x]->main) . '/' . Slug::_url($tcat->results()[$x]->subitem)  .'">' . $tcat->results()[$x]->subitem .'</a> </li>';
 					$subtitle = strtolower($tcat->results()[$x]->subitem);
 				}
 				
@@ -95,7 +95,7 @@ class WebObjects{
 			$results = $tcat->results();
 			$maintitle = $subtitle = '';
 			for($x = 0;$x < count($results);$x++){
-				$li .= '<li class="menu-item menu-item-type-post_type menu-item-object-page" onclick="window.location.href = \'/'. Slug::url_slug(strtolower($tcat->results()[$x]->main)).'\';"><a href="/'. Slug::url_slug(strtolower($tcat->results()[$x]->main)).'">'.$tcat->results()[$x]->main.'</a> </li>';			
+				$li .= '<li class="menu-item menu-item-type-post_type menu-item-object-page" onclick="window.location.href = \'/'. Slug::_url(strtolower($tcat->results()[$x]->main)).'\';"><a href="/'. Slug::_url(strtolower($tcat->results()[$x]->main)).'">'.$tcat->results()[$x]->main.'</a> </li>';			
 			}	
 			if($user->hasPermission('admin'))
 				$li .= '<li><a href="/cpanel"><span>Control Panel</span></a></li>';
@@ -146,7 +146,7 @@ class WebObjects{
 		$li = $getUser?'<li class="breadcrumb-item"><a href="/' .$getUser. '">' . ucwords(str_replace('_',' ',$getUser)) .' </a></li>':'';
 
 		for($x = 0;$x < count($breadcrumbs);$x++){
-			$url  .= ($x <= $last && $x > 0?'/':'') . Slug::url_slug($breadcrumbs[$x])  ;
+			$url  .= ($x <= $last && $x > 0?'/':'') . Slug::_url($breadcrumbs[$x])  ;
 			$li .= '<li class="breadcrumb-item '.($x == $last?'active':'') . '"><a href="/' .($getUser?$getUser.'/':''). $url . '">' . ucwords(str_replace('_',' ',$breadcrumbs[$x])) .' </a></li>';
 		}
 		return $li;
@@ -192,7 +192,7 @@ class WebObjects{
 		$tpltag =  new Template("tag_n.tpl");			
 		foreach($genre as $genre_item){
 			if(trim($genre_item) != ''){
-				$tpltag->setArray(array('url'=>$url.'/'. slug::url_slug($genre_item),'tag'=>ucfirst($genre_item)));
+				$tpltag->setArray(array('url'=>$url.'/'. Slug::_url($genre_item),'tag'=>ucfirst($genre_item)));
 				$genreLinks .= $tpltag->show();
 			}
 		}

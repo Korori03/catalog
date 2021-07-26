@@ -1,11 +1,11 @@
 <?php
 
 /*
-	* Korori-Gaming
 	* Input Class Set
 	* @Version 4.0.0
 	* Developed by: Ami (亜美) Denault
 */
+declare(strict_types=1);
 class Input{
 
 /*
@@ -13,7 +13,7 @@ class Input{
 	* @since 4.0.0	
 	* @Param (String Type {Post or Get})
 */			
-		public static function exists($type ='post'){
+		public static function exists(string $type ='post'):bool{
 			switch($type){
 				case 'post':
 					return (!empty($_POST))?true:false;
@@ -32,7 +32,7 @@ class Input{
 	* @since 4.0.0	
 	* @Param (String Item)
 */		
-	public static function get($item){
+	public static function get(string $item):string{
 		if(isset($_POST[$item])){
 			return Sanitize::clean($_POST[$item]);
 		}else if(isset($_GET[$item])){

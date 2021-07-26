@@ -24,6 +24,6 @@
 	$array = implode("','",$files);
 	$query= Database::getInstance()->query("SELECT id,name,brand,`system` as t,region FROM games WHERE id NOT IN ('".$array."')");
 	foreach($query->results() as $item) {
-		echo $item->id . ',' .$item->name .  ',' . $item->brand .  ' ' . $item->t . ',' . $item->region .',' . slug::url_slug($item->id . ' ' .$item->name .' ' .($item->region == 'United States'?'usa':$item->region)) . '</br>';
+		echo $item->id . ',' .$item->name .  ',' . $item->brand .  ' ' . $item->t . ',' . $item->region .',' . Slug::_url($item->id . ' ' .$item->name .' ' .($item->region == 'United States'?'usa':$item->region)) . '</br>';
 	}
 ?>

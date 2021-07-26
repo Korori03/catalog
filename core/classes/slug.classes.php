@@ -1,7 +1,6 @@
 <?php
 
 /*
-	* Korori-Gaming
 	* Slug Creation Class Set
 	* @Version 4.0.0
 	* Developed by: Ami (亜美) Denault
@@ -10,32 +9,43 @@
 	* Setup Slug Creation Class
 	* @since 4.0.0
 */
+
+declare(strict_types=1);
+
 class Slug{
-		
-	public static function url_raw($str){
-		$str = mb_convert_encoding((string)$str, 'UTF-8', mb_list_encodings());
-		
+
+/*
+	* Convert Raw String
+	* @since 4.0.0
+	* @param (String Name)
+*/
+	public static function _raw(mixed $str) : string {
+		$str = mb_convert_encoding(cast::_string($str), 'UTF-8', mb_list_encodings());
 		$str = str_replace('-', ' ', $str);
 		return $str;
-	}	
-	public static function url_slug($str, $options = array()) {
-		// Make sure string is in UTF-8 and strip invalid UTF-8 characters
-		$str = mb_convert_encoding((string)$str, 'UTF-8', mb_list_encodings());
-		
+	}
+
+/*
+	* Convert String to Usable URL
+	* @since 4.0.0
+	* @param (String Name,Array Options)
+*/
+	public static function _url(mixed $str, $options = array()): string {
+		$str = mb_convert_encoding(cast::_string($str), 'UTF-8', mb_list_encodings());
+
 		$defaults = array(
-			'delimiter' => '_',
+			'delimiter' => '-',
 			'limit' => null,
 			'lowercase' => true,
 			'replacements' => array(),
 			'transliterate' => false,
 		);
 		
-		// Merge options
 		$options = array_merge($defaults, $options);
-		
+
 		$char_map = array(
 			// Latin
-			'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'Ç' => 'C', 
+			'À' => 'A', 'Á' => 'A', 'Â' => 'A', 'Ã' => 'A', 'Ä' => 'A', 'Å' => 'A', 'Æ' => 'AE', 'Ç' => 'C',
 			'È' => 'E', 'É' => 'E', 'Ê' => 'E', 'Ë' => 'E', 'Ì' => 'I', 'Í' => 'I', 'Î' => 'I', 'Ï' => 'I', 
 			'Ð' => 'D', 'Ñ' => 'N', 'Ò' => 'O', 'Ó' => 'O', 'Ô' => 'O', 'Õ' => 'O', 'Ö' => 'O', 'Ő' => 'O', 
 			'Ø' => 'O', 'Ù' => 'U', 'Ú' => 'U', 'Û' => 'U', 'Ü' => 'U', 'Ű' => 'U', 'Ý' => 'Y', 'Þ' => 'TH', 
@@ -92,26 +102,19 @@ class Slug{
 			'š' => 's', 'ū' => 'u', 'ž' => 'z'
 		);
 		
-		// Make custom replacements
 		$str = preg_replace(array_keys($options['replacements']), $options['replacements'], $str);
-		
-		// Transliterate characters to ASCII
-		if ($options['transliterate']) {
+
+		if ($options['transliterate'])
 			$str = str_replace(array_keys($char_map), $char_map, $str);
-		}
-		
-		// Replace non-alphanumeric characters with our delimiter
+
 		$str = preg_replace('/[^\p{L}\p{Nd}]+/u', $options['delimiter'], $str);
-		
-		// Remove duplicate delimiters
+
 		$str = preg_replace('/(' . preg_quote($options['delimiter'], '/') . '){2,}/', '$1', $str);
-		
-		// Truncate slug to max. characters
+
 		$str = mb_substr($str, 0, ($options['limit'] ? $options['limit'] : mb_strlen($str, 'UTF-8')), 'UTF-8');
-		
-		// Remove delimiter from ends
+
 		$str = trim($str, $options['delimiter']);
-		
+
 		return $options['lowercase'] ? mb_strtolower($str, 'UTF-8') : $str;
 	}
 

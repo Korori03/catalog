@@ -136,7 +136,7 @@ class Pages{
 	private static function homeList($sql,$type){
 		$nest_home					= new Template("home_list.tpl");
 		$nest_list 					= new Template("item_10.tpl");
-		$items = $list = $url = '';
+		$items = $list = $url = $subname = '';
 
 		$getUser 					= Input::get('user');
 
@@ -146,16 +146,20 @@ class Pages{
 			foreach($q->results() as $b){
 				switch($type){
 					case 'books':
-						$url =	'/books/' . slug::url_slug($b->type) . '/' . $b->id . '-' . Slug::url_slug($b->name);
+						$url =	'/books/' . slug::_url($b->type) . '/' . $b->id . '-' . slug::_url($b->name);
+						$subname = str::_format($type) . ' ('.str::_format($b->type).')';
 						break;
 					case 'games':
-						$url =	'/games/' .Slug::url_slug($b->brand) . '/'.Slug::url_slug($b->system) .'/' . $b->id . '-' . Slug::url_slug($b->name);
+						$url =	'/games/' .slug::_url($b->brand) . '/'.slug::_url($b->system) .'/' . $b->id . '-' . slug::_url($b->name);
+						$subname = str::_format($type) . ' ('.str::_format($b->system).')';
 						break;
 					case 'videos':
-						$url = 	'/videos/' . strtolower($b->type) . '/' . $b->id . '-' . Slug::url_slug($b->name);
+						$url = 	'/videos/' . strtolower($b->type) . '/' . $b->id . '-' . slug::_url($b->name);
+						$subname = str::_format($type). ' ('.str::_format($b->type).')';
 						break;
 					case 'music':
-						$url =	'/music/' . strtolower($b->type) . '/' . $b->id . '-' . Slug::url_slug($b->album . ' '. $b->artist);
+						$url =	'/music/' . strtolower($b->type) . '/' . $b->id . '-' . slug::_url($b->album . ' '. $b->artist);
+						$subname = str::_format($type). ' ('.str::_format($b->type).')';
 						break;
 				}
 				$nest_list->setArray(
@@ -163,13 +167,13 @@ class Pages{
 							'url'		=>	($getUser?'/'.$getUser:'').	$url,
 							'region'	=>	WebObjects::regionShort($b->region),
 							'name'		=>	$b->name,
-							'subname'	=>	ucwords($b->type)
+							'subname'	=>	$subname
 					)
 				);
 				
 				$list .= $nest_list->show();
 			}
-			$nest_home->setArray(array('type'=>ucwords($type),'list'=>$list));
+			$nest_home->setArray(array('type'=>str::_format($type),'list'=>$list));
 			$items .= $nest_home->show();
 		}
 		return $items;
@@ -196,7 +200,7 @@ class Pages{
 					if($b->{$h} === 'Y'){
 						$nest_item->setArray(array(
 							'item'	=> $h,
-							'url'	=> '/' . Slug::url_slug(strtolower($b->username)).'/'.$h
+							'url'	=> '/' . slug::_url($b->username).'/'.$h
 						));
 						$list .= $nest_item->show();
 						$cc++;
@@ -210,7 +214,7 @@ class Pages{
 				$nest_list->setArray(
 					array(
 						'url'			=> 	$url,
-						'name'			=>	ucwords($b->username),
+						'name'			=>	str::_format($b->username),
 						'list'			=>	$list
 					)
 				);
@@ -327,7 +331,7 @@ class Pages{
 				'year'				=>  $games->release_date,
 				'percentage'		=>  $games->percentage,
 				'system'			=>	$games->brand,
-				'url'				=>	($getUser?'/'.$getUser:'').'/games/' .Slug::url_slug($games->brand) 
+				'url'				=>	($getUser?'/'.$getUser:'').'/games/' .slug::_url($games->brand) 
 			));
 			$list 					.= $item->show();
 			
@@ -342,7 +346,7 @@ class Pages{
 		$game->setArray(
 			array(
 				'list'				=>	$list,
-				'breadcrumb'		=>	'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.Slug::url_slug($getUser).'">'.ucwords($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/games">Games</a></li></ol>'
+				'breadcrumb'		=>	'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.slug::_url($getUser).'">'.str::_format($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/games">Games</a></li></ol>'
 			)
 		);
 		self::$page_title 			= 'Games' ;
@@ -422,7 +426,7 @@ class Pages{
 					'year'				=>  $games->release_date,
 					'percentage'		=>  $games->percentage,
 					'system'			=>	$games->type,
-					'url'				=>	($getUser?'/'.$getUser:'').'/movies/' .Slug::url_slug($games->type) 
+					'url'				=>	($getUser?'/'.$getUser:'').'/movies/' .slug::_url($games->type) 
 				)
 			);
 			$list 						.=	$item->show();
@@ -437,7 +441,7 @@ class Pages{
 		}
 		$game->setArray(array(
 			'list'						=>	$list,
-			'breadcrumb'				=>	'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.Slug::url_slug($getUser).'">'.ucwords($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/movies">Movies</a></li></ol>'
+			'breadcrumb'				=>	'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.slug::_url($getUser).'">'.str::_format($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/movies">Movies</a></li></ol>'
 		));
 		self::$page_title 				= 'Movies' ;
 		return $game->show();
@@ -514,7 +518,7 @@ class Pages{
 					'year'				=>  $games->release_date,
 					'percentage'		=>  $games->percentage,
 					'system'			=>	$games->type,
-					'url'				=>	($getUser?'/'.$getUser:''). '/music/' .Slug::url_slug($games->type) 
+					'url'				=>	($getUser?'/'.$getUser:''). '/music/' .slug::_url($games->type) 
 			));
 			$list .=$item->show();
 			
@@ -530,7 +534,7 @@ class Pages{
 		$game->setArray(
 			array(
 				'list'						=>	$list,
-				'breadcrumb'=>'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.Slug::url_slug($getUser).'">'.ucwords($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/music">Music</a></li></ol>'
+				'breadcrumb'=>'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.slug::_url($getUser).'">'.str::_format($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/music">Music</a></li></ol>'
 			)
 		);
 		self::$page_title 					= 'Music' ;
@@ -605,7 +609,7 @@ class Pages{
 				'year'				=>  $games->release_date,
 				'percentage'		=>  $games->percentage,
 				'system'			=>	$games->type,
-				'url'				=>	($getUser?'/'.$getUser:''). '/videos/' .Slug::url_slug($games->type) 
+				'url'				=>	($getUser?'/'.$getUser:''). '/videos/' .slug::_url($games->type) 
 			));
 			$list .=$item->show();
 			
@@ -710,7 +714,7 @@ class Pages{
 				'year'				=>  '',//$games->release_date,
 				'percentage'		=>  (float)$games->percentage,
 				'system'			=>	$games->type,
-				'url'				=>	($getUser?'/'.$getUser:'').'/books/' .Slug::url_slug($games->type) 
+				'url'				=>	($getUser?'/'.$getUser:'').'/books/' .slug::_url($games->type) 
 			));
 			$list .=$item->show();
 			
@@ -725,7 +729,7 @@ class Pages{
 		}
 		$game->setArray(array(
 			'list'=>$list,
-			'breadcrumb'=>'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.Slug::url_slug($getUser).'">'.ucwords($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/books">Books</a></li></ol>'
+			'breadcrumb'=>'<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.slug::_url($getUser).'">'.str::_format($getUser).'</a></li>':'').'<li class="breadcrumb-item active"><a href="/books">Books</a></li></ol>'
 		));
 		self::$page_title 			= 'Books' ;
 		return $game->show();
@@ -764,7 +768,7 @@ class Pages{
 				'australia'			=>  (int)$games->australia,
 				'percentage'		=>  (float)$games->percentage,
 				'system'			=>	$games->gsystem . ' ('.$games->release_date.')',
-				'url'				=>	($getUser?'/'.$getUser:'').'/games/' .Slug::url_slug($games->brand) . '/'.Slug::url_slug($games->gsystem)
+				'url'				=>	($getUser?'/'.$getUser:'').'/games/' .slug::_url($games->brand) . '/'.slug::_url($games->gsystem)
 			));
 			$bname					= $games->brand;
 			$list .=$item->show();
@@ -774,9 +778,9 @@ class Pages{
 			'list'=>$list,
 			'brand'		=>	$get->first()->brand,
 			'objects'	=>	($getUser?$getUser .';':'') . implode(';',$breadcrumbs),
-			'breadcrumb'=> '<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.Slug::url_slug($getUser).'">'.ucwords($getUser).'</a></li>':'').'<li class="breadcrumb-item"><a href="/games">Games</a></li><li class="breadcrumb-item active">' . $bname.'</li></ol>'
+			'breadcrumb'=> '<ol class="breadcrumb">'.($getUser?'<li class="breadcrumb-item active"><a href="/'.slug::_url($getUser).'">'.str::_format($getUser).'</a></li>':'').'<li class="breadcrumb-item"><a href="/games">Games</a></li><li class="breadcrumb-item active">' . $bname.'</li></ol>'
 		));
-		self::$page_title 			= ucwords(str_replace('_',' ',$bname)) . ' :: Games';
+		self::$page_title 			= str::_format(str_replace('_',' ',$bname)) . ' :: Games';
 		return $game->show();
 	}
 
@@ -794,7 +798,7 @@ class Pages{
 
 		$main_type					= 'games';
 		$breadcrumbs				= array($main_type,$subtype,$subnestedtype);
-		$page_title					= ucwords(str_replace('_',' ',$subnestedtype)) . ' :: ' . ucwords(str_replace('_',' ',$subtype)) . ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subnestedtype)) . ' :: ' . str::_format(str_replace('_',' ',$subtype)) . ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					= ($getUser?'/'.$getUser:'') . "/$main_type/$subtype/$subnestedtype";
 		
 		$symbols = array('0','1','2','3','4','5','6','7','8','9',')','(','@','.','!');
@@ -882,7 +886,7 @@ class Pages{
 		$main_type					= 'games';
 		$breadcrumbs				= array($main_type,$subtype,$subnestedtype);
 
-		$page_title					= ucwords(str_replace('_',' ',$subtype)) . ' :: ' .ucwords(str_replace('_',' ',$subnestedtype)) . ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subtype)) . ' :: ' .str::_format(str_replace('_',' ',$subnestedtype)) . ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					= "/$main_type/$subtype/$subnestedtype";
 		$secondary					= "Developer: ";
 		$getUser 					= Input::get('user');
@@ -940,7 +944,7 @@ class Pages{
 		$getUser = Input::get('user');
 		$main_type					= 'books';
 		$breadcrumbs				= array($main_type,$subtype);
-		$page_title					= ucwords(str_replace('_',' ',$subtype)) . ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subtype)) . ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					= ($getUser?'/'.$getUser:'') . "/$main_type/$subtype" ;
 		
 	
@@ -1010,7 +1014,7 @@ class Pages{
 		
 		$main_type					= 'books';
 		$breadcrumbs				= array($main_type,$subtype);
-		$page_title					= ucwords(str_replace('_',' ',$subtype)) . ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subtype)) . ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					= "/$main_type/$subtype";
 		$secondary					= "Author";
 		
@@ -1056,7 +1060,7 @@ class Pages{
 		$getUser = Input::get('user');
 		$main_type					= 'music';
 		$breadcrumbs				= array($main_type,$subtype);
-		$page_title					= ucwords(str_replace('_',' ',$subtype)) . ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subtype)) . ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					=  ($getUser?'/'.$getUser:'') ."/$main_type/$subtype";
 		
 		
@@ -1117,7 +1121,7 @@ class Pages{
 		
 		$main_type					= 'music';
 		$breadcrumbs				= array($main_type,$subtype);
-		$page_title					= ucwords(str_replace('_',' ',$subtype)) . ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subtype)) . ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					= "/$main_type/$subtype";
 		$secondary					= "";
 		$user = new User();
@@ -1159,7 +1163,7 @@ class Pages{
 		$user = new User();
 		$getUser = Input::get('user');
 		$breadcrumbs				= array($main_type,$subtype);
-		$page_title					= ucwords(str_replace('_',' ',$subtype) ). ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subtype) ). ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					= ($getUser?'/'.$getUser:'') . "/$main_type/$subtype";
 		
 		
@@ -1224,7 +1228,7 @@ class Pages{
 	
 		$main_type					= 'videos';
 		$breadcrumbs				= array($main_type,$subtype);
-		$page_title					= ucwords(str_replace('_',' ',$subtype)) . ' :: ' .ucwords(str_replace('_',' ',$main_type));
+		$page_title					= str::_format(str_replace('_',' ',$subtype)) . ' :: ' .str::_format(str_replace('_',' ',$main_type));
 		$url_link					= "/$main_type/$subtype";
 		$secondary					= "Developer";
 
@@ -1304,7 +1308,7 @@ class Pages{
 			$items = $get->results();
 			for($x;$x <=  $x_end;$x++){	
 				$item->setArray(array(
-					'url' 			=> 	$url_link.'/'.$items[$x]->id.'-'.Slug::url_slug($items[$x]->name),
+					'url' 			=> 	$url_link.'/'.$items[$x]->id.'-'.slug::_url($items[$x]->name),
 					'region' 		=>	Webobjects::regionShort($items[$x]->region),
 					'name' 			=>	$items[$x]->name,
 					'release_date' 	=>	$items[$x]->release_date,
@@ -1337,7 +1341,7 @@ class Pages{
 			'pagin'					=> 	$Pagination->pagination()
 		));
 		}
-		self::$page_title 			= ucwords(str_replace('_',' ',$page_title));
+		self::$page_title 			= str::_format(str_replace('_',' ',$page_title));
 		return $game->show();	
 	}
 
@@ -1360,9 +1364,9 @@ class Pages{
 
 		$selected_i					=  $get->first();
 	
-		$s 							= $selected_i->id . '_' .Slug::url_slug($selected_i->name);
-		$urlname					= $selected_i->id . '-' .Slug::url_slug($selected_i->name);
-		$image =  (isset($_SERVER['HTTPS'] )? 'https://':'http://') . $_SERVER['HTTP_HOST'] . '/content/uploads/' . $s  . '_' .Slug::url_slug($selected_i->region == 'United States'?'usa':($selected_i->region == 'Japanese'?'japan':$selected_i->region)). '.jpg';
+		$s 							= $selected_i->id . '_' .slug::_url($selected_i->name);
+		$urlname					= $selected_i->id . '-' .slug::_url($selected_i->name);
+		$image =  (isset($_SERVER['HTTPS'] )? 'https://':'http://') . $_SERVER['HTTP_HOST'] . '/content/uploads/' . $s  . '_' .slug::_url($selected_i->region == 'United States'?'usa':($selected_i->region == 'Japanese'?'japan':$selected_i->region)). '.jpg';
 		
 		$context = stream_context_create( array(
 			'http'=>array(
@@ -1400,12 +1404,12 @@ class Pages{
 							'secondary'		=> $secondary,
 							'secondary_list'=>WebObjects::createList($selected_i->secondary,$url_link .'/' . $secondary),
 							'genre' 		=>WebObjects::createList($selected_i->genre,$url_link.'/genre'),
-							'slug'			=>Slug::url_slug($selected_i->name),
+							'slug'			=>slug::_url($selected_i->name),
 							'img'			=>$image
 						)
 					);
 					
-		self::$page_title 			= ucwords(str_replace('_',' ',$page_title));
+		self::$page_title 			= str::_format(str_replace('_',' ',$page_title));
 		return $game->show();	
 	}
 
@@ -1445,7 +1449,7 @@ class Pages{
 		for($x;$x <=  $x_end;$x++){	
 			$items = $gnl->results()[$x];
 			$item->setArray(array(
-				'url' 			=> 	$url_link.'/'.$items->id.'-'.Slug::url_slug($items->name),
+				'url' 			=> 	$url_link.'/'.$items->id.'-'.slug::_url($items->name),
 				'region' 		=>	Webobjects::regionShort($items->region),
 				'name' 			=>	$items->name,
 				'release_date' 	=>	$items->release_date,
@@ -1464,7 +1468,7 @@ class Pages{
 			'pagin'					=> 	$Pagination->pagination()
 		));
 		
-		self::$page_title 			= ucwords(str_replace('_',' ',$page_title));
+		self::$page_title 			= str::_format(str_replace('_',' ',$page_title));
 		return $game->show();
 	}
 	
@@ -1479,18 +1483,18 @@ class Pages{
 				$main_type					= $objects[0];
 				$breadcrumbs				= $objects;
 				if((count($objects) - 1) == 2){
-					$page_title					= ucwords(str_replace('_',' ',$objects[2])) . ' :: ' . ucwords(str_replace('_',' ',$objects[1])) . ' :: ' .ucwords(str_replace('_',' ',$objects[0]));
+					$page_title					= str::_format(str_replace('_',' ',$objects[2])) . ' :: ' . str::_format(str_replace('_',' ',$objects[1])) . ' :: ' .str::_format(str_replace('_',' ',$objects[0]));
 					$url_link					= "/" . $objects[0] ."/" .$objects[1] ."/".$objects[2];
 					$sql = "Call GamesBySystemSearch('".str_replace('_',' ',$objects[1])."','".str_replace('_',' ',$objects[2])."','" .str_replace('_',' ',$search). "','" .self::$userid . "');";
 					return Pages::generateList($main_type,$breadcrumbs,$page_title,$url_link,$sql,$search);					
 				}else if((count($objects) - 1) == 1){
-					$page_title					=	ucwords(str_replace('_',' ',$objects[1])) . ' :: ' .ucwords(str_replace('_',' ',$objects[0]));
+					$page_title					=	str::_format(str_replace('_',' ',$objects[1])) . ' :: ' .str::_format(str_replace('_',' ',$objects[0]));
 					$url_link					= "/" . $objects[0] ."/" .$objects[1];
 					$sql = "call GamesByBrandSearch('".str_replace('_',' ',$objects[1])."','" . str_replace('_',' ',$search). "','" .self::$userid . "');";			
 					return Pages::generateList($main_type,$breadcrumbs,$page_title,$url_link,$sql,$search);					
 
 				}else{
-					$page_title					=	ucwords(str_replace('_',' ',$objects[0]));
+					$page_title					=	str::_format(str_replace('_',' ',$objects[0]));
 					$url_link					= "/" . $objects[0] ;
 					$sql = "call GamesSearch('" . str_replace('_',' ',$search)."');";
 					return Pages::generateList($main_type,$breadcrumbs,$page_title,$url_link,$sql,$search);					
@@ -1501,12 +1505,12 @@ class Pages{
 				$breadcrumbs				= $objects;
 
 				if((count($objects) - 1) == 1){
-					$page_title					=	ucwords(str_replace('_',' ',$objects[0]));
+					$page_title					=	str::_format(str_replace('_',' ',$objects[0]));
 					$url_link					= "/" . $objects[0] ."/" .$objects[1];
 					$sql = "call BooksTypeSearch('".str_replace('_',' ',$objects[1])."','" . str_replace('_',' ',$search). "','" .self::$userid . "');";
 					return Pages::generateList($main_type,$breadcrumbs,$page_title,$url_link,$sql,$search);					
 				}else{
-					$page_title					=	ucwords(str_replace('_',' ',$objects[0]));
+					$page_title					=	str::_format(str_replace('_',' ',$objects[0]));
 					$url_link					= "/" . $objects[0];
 					$sql = "call BooksSearch('" . str_replace('_',' ',$search). "','" .self::$userid . "');";
 					return Pages::generateList($main_type,$breadcrumbs,$page_title,$url_link,$sql,$search);					
@@ -1517,13 +1521,13 @@ class Pages{
 				$breadcrumbs				= $objects;
 
 				if((count($objects) - 1) == 1){
-					$page_title					=	ucwords(str_replace('_',' ',$objects[0]));
+					$page_title					=	str::_format(str_replace('_',' ',$objects[0]));
 					$url_link					= "/" . $objects[0] ."/" .$objects[1];
 					$sql = "call MusicTypeSearch('".str_replace('_',' ',$objects[1])."','" . str_replace('_',' ',$search). "','" .self::$userid . "');";
 
 					return Pages::generateList($main_type,$breadcrumbs,$page_title,$url_link,$sql,$search);									
 				}else{
-					$page_title					=	ucwords(str_replace('_',' ',$objects[0]));
+					$page_title					=	str::_format(str_replace('_',' ',$objects[0]));
 					$url_link					= "/" . $objects[0];
 					$sql = "call MusicSearch('" . str_replace('_',' ',$search). "','" .self::$userid . "');";
 					return Pages::generateList($main_type,$breadcrumbs,$page_title,$url_link,$sql,$search);					
